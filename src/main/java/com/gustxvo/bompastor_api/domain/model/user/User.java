@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.UUID;
 
@@ -12,21 +13,24 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
     private UUID id;
 
+    @Column(name = "name")
     private String name;
 
-    @Column(unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
+    @Column(name = "password")
     private String password;
 
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private UserRole role;
 
     public User(String name, String email, String password, UserRole role) {
