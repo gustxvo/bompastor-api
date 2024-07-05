@@ -17,7 +17,7 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id")
     private UUID id;
 
@@ -38,5 +38,9 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public User(UUID workerId) {
+        this.id = workerId;
     }
 }
