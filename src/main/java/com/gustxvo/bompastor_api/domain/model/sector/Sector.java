@@ -15,6 +15,7 @@ public class Sector {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "sector_id")
     private Integer id;
 
     private String name;
