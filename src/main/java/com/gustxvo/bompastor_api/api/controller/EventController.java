@@ -14,9 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/events")
@@ -28,9 +30,22 @@ public class EventController {
     private final UserRepository userRepository;
 
     @GetMapping
-    public List<EventDto> list(@Param("userId") String userId) {
+    public List<EventDto> list(@Param("workerId") String workerId) {
         return eventRepository.findAll().stream()
-                .filter((event -> event.getWorkers().stream().anyMatch(user -> Objects.equals(user.getId(), UUID.fromString(userId)))))
+                .filter((event -> event.getWorkers().stream()
+                        .anyMatch(user -> Objects.equals(user.getId(), UUID.fromString(workerId)))))
+                .map(EventDto::fromEntity)
+                .toList();
+    }
+
+    @GetMapping("/leader/{leaderId}")
+    public List<EventDto> leaderEvents(@PathVariable("leaderId") String leaderId) {
+        return eventRepository.findAll().stream()
+                .filter((Event event) -> {
+                    System.out.println(event);
+                    User leader = event.getSector().getLeader();
+                    return Objects.equals(leader.getId(), UUID.fromString(leaderId));
+                })
                 .map(EventDto::fromEntity)
                 .toList();
     }
@@ -50,13 +65,28 @@ public class EventController {
         return ResponseEntity.ok(eventCreated);
     }
 
-    @PostMapping
-    public EventDto create() {
+    @PutMapping("/{eventId}")
+    public ResponseEntity<EventDto> update(
+            @PathVariable("eventId") Long eventId, @RequestBody EventInput eventInput) {
+        Sector sector = sectorRepository.findById(eventInput.sectorId()).orElseThrow();
+        Set<User> workers = new HashSet<>(userRepository.findAllById(eventInput.workers()));
+
         Event event = new Event();
-        event.setDateTime(LocalDateTime.now());
-        event.setWorkers(Set.of(new User(UUID.fromString("00a7b810-9dad-11d1-80b4-00c04fd430c8"))));
-        event.setSector(new Sector(1));
-        var created = eventRepository.save(event);
-        return EventDto.fromEntity(created);
+        event.setId(eventId);
+        event.setSector(sector);
+        event.setWorkers(workers);
+        event.setDateTime(eventInput.dateTime());
+
+        EventDto eventCreated = EventDto.fromEntity(eventRepository.save(event));
+        return ResponseEntity.ok(eventCreated);
     }
+
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> delete(@PathVariable("eventId") Long eventId) {
+        if (!eventRepository.existsById(eventId)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.noContent().build();
+    }
+
 }
