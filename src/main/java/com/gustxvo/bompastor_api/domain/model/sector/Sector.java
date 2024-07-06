@@ -35,13 +35,13 @@ public class Sector {
             joinColumns = @JoinColumn(name = "sector_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<User> users=new HashSet<>();
+    private Set<User> workers = new HashSet<>();
 
     public Sector(Integer sectorId) {
         this.id = sectorId;
     }
 
     public void addWorker(User worker) {
-        users.add(worker);
+        workers.add(worker);
     }
 }

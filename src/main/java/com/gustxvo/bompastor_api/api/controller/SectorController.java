@@ -1,6 +1,7 @@
 package com.gustxvo.bompastor_api.api.controller;
 
 import com.gustxvo.bompastor_api.api.model.sector.SectorDto;
+import com.gustxvo.bompastor_api.api.model.sector.WorkerIdInput;
 import com.gustxvo.bompastor_api.domain.model.sector.Sector;
 import com.gustxvo.bompastor_api.domain.model.user.User;
 import com.gustxvo.bompastor_api.domain.repository.SectorRepository;
@@ -30,18 +31,27 @@ public class SectorController {
     private final UserRepository userRepository;
 
     @GetMapping
-    public Set<SectorDto> sectors(@Param("leader_id") String leaderId) {
+    public Set<SectorDto> sectorsByLeader(@Param("leaderId") String leaderId) {
         return sectorRepository.findByLeaderId(UUID.fromString(leaderId)).stream()
                 .map(SectorDto::fromEntity)
                 .collect(Collectors.toSet());
     }
 
-    @PostMapping("/add-worker/{sectorId}")
+    @GetMapping("/{sectorId}")
+    public ResponseEntity<SectorDto> getSector(@PathVariable("sectorId") Integer sectorId) {
+        if (!sectorRepository.existsById(sectorId)) {
+            return ResponseEntity.notFound().build();
+        }
+        SectorDto sector = SectorDto.fromEntity(sectorRepository.findById(sectorId).orElseThrow());
+        return ResponseEntity.ok(sector);
+    }
+
+    @PostMapping("/{sectorId}/add-worker")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> addWorker(
-            @PathVariable("sectorId") Integer sectorId, @RequestBody String workerId) {
+            @PathVariable("sectorId") Integer sectorId, @RequestBody WorkerIdInput workerId) {
         Sector sector = sectorRepository.findById(sectorId).orElseThrow();
-        User worker = userRepository.findById(UUID.fromString(workerId)).orElseThrow();
+        User worker = userRepository.findById(workerId.uuid()).orElseThrow();
         sector.addWorker(worker);
         sectorRepository.save(sector);
 
