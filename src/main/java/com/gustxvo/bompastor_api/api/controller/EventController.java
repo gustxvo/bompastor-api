@@ -9,16 +9,12 @@ import com.gustxvo.bompastor_api.domain.repository.EventRepository;
 import com.gustxvo.bompastor_api.domain.repository.SectorRepository;
 import com.gustxvo.bompastor_api.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/events")
@@ -28,27 +24,6 @@ public class EventController {
     private final EventRepository eventRepository;
     private final SectorRepository sectorRepository;
     private final UserRepository userRepository;
-
-    @GetMapping
-    public List<EventDto> list(@Param("workerId") String workerId) {
-        return eventRepository.findAll().stream()
-                .filter((event -> event.getWorkers().stream()
-                        .anyMatch(user -> Objects.equals(user.getId(), UUID.fromString(workerId)))))
-                .map(EventDto::fromEntity)
-                .toList();
-    }
-
-    @GetMapping("/leader/{leaderId}")
-    public List<EventDto> leaderEvents(@PathVariable("leaderId") String leaderId) {
-        return eventRepository.findAll().stream()
-                .filter((Event event) -> {
-                    System.out.println(event);
-                    User leader = event.getSector().getLeader();
-                    return Objects.equals(leader.getId(), UUID.fromString(leaderId));
-                })
-                .map(EventDto::fromEntity)
-                .toList();
-    }
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
