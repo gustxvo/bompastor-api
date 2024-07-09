@@ -1,6 +1,6 @@
-INSERT INTO tb_users (user_id, name, email, password, role) VALUES ('00a7b810-9dad-11d1-80b4-00c04fd430c8', 'Gustavo Braga', 'braga@bp.com', 'braga123', 'ADMIN');
-INSERT INTO tb_users (user_id, name, email, password, role) VALUES ('01a7b810-9dad-11d1-80b4-00c04fd430c8', 'Matheus Torres', 'matheus@bp.com', 'matheus123', 'LEADER');
-INSERT INTO tb_users (user_id, name, email, password, role) VALUES ('02a7b810-9dad-11d1-80b4-00c04fd430c8', 'Gustavo Almeida', 'almeida@bp.com', 'almeida123', 'WORKER');
+INSERT INTO tb_users (user_id, name, email, password, role) VALUES ('00a7b810-9dad-11d1-80b4-00c04fd430c8', 'Gustavo Braga', 'braga@bp.com', '$2a$10$.KId/voVjkx.pqJ61YA9QOjWkE3qdPr8aN0k9ZJ.pv23f2Z2O0bNu', 'ADMIN');
+INSERT INTO tb_users (user_id, name, email, password, role) VALUES ('01a7b810-9dad-11d1-80b4-00c04fd430c8', 'Matheus Torres', 'matheus@bp.com', '$2a$10$lRBjDa0XzSlFb32kcs54Y.lTraiyS5Bal2Tz8riZiI6J/1pwWaTvy', 'LEADER');
+INSERT INTO tb_users (user_id, name, email, password, role) VALUES ('02a7b810-9dad-11d1-80b4-00c04fd430c8', 'Gustavo Almeida', 'almeida@bp.com', '$2a$10$6kP1upOqNT7Lxu3X6/2BeurvwM3k.FrOjnJwOWLFzxbMTEaWYfYtO', 'WORKER');
 
 INSERT INTO tb_sectors (leader_id, name) VALUES ('01a7b810-9dad-11d1-80b4-00c04fd430c8', 'Recep');
 INSERT INTO tb_sectors (leader_id, name) VALUES ('01a7b810-9dad-11d1-80b4-00c04fd430c8', 'Midia');
