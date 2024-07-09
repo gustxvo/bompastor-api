@@ -3,7 +3,7 @@ INSERT INTO tb_users (user_id, name, email, password, role) VALUES ('01a7b810-9d
 INSERT INTO tb_users (user_id, name, email, password, role) VALUES ('02a7b810-9dad-11d1-80b4-00c04fd430c8', 'Gustavo Almeida', 'almeida@bp.com', '$2a$10$6kP1upOqNT7Lxu3X6/2BeurvwM3k.FrOjnJwOWLFzxbMTEaWYfYtO', 'WORKER');
 
 INSERT INTO tb_sectors (leader_id, name) VALUES ('01a7b810-9dad-11d1-80b4-00c04fd430c8', 'Recep');
-INSERT INTO tb_sectors (leader_id, name) VALUES ('01a7b810-9dad-11d1-80b4-00c04fd430c8', 'Midia');
+INSERT INTO tb_sectors (leader_id, name) VALUES ('01a7b810-9dad-11d1-80b4-00c04fd430c8', 'Mídia');
 INSERT INTO tb_sectors (leader_id, name) VALUES ('00a7b810-9dad-11d1-80b4-00c04fd430c8', 'Louvor');
 
 INSERT INTO tb_sectors_users (sector_id, user_id) VALUES (1, '00a7b810-9dad-11d1-80b4-00c04fd430c8');

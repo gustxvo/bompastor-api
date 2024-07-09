@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -64,7 +63,7 @@ public class AuthController {
                 .subject(user.getId().toString())
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiresIn))
-                .claim("role", user.getRole())
+                .claim("scope", user.getRole())
                 .build();
 
         String jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
