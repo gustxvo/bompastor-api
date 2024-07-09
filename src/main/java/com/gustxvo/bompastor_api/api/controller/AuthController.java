@@ -32,6 +32,8 @@ public class AuthController {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    private static final int EXPIRES_IN = 86400;
+
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<UserDto> register(@RequestBody RegisterRequest registerRequest) {
@@ -56,19 +58,18 @@ public class AuthController {
                 .orElseThrow(() -> new BadCredentialsException("User or password is invalid"));
 
         Instant now = Instant.now();
-        int expiresIn = 300;
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("bompastor-api")
                 .subject(user.getId().toString())
                 .issuedAt(now)
-                .expiresAt(now.plusSeconds(expiresIn))
+                .expiresAt(now.plusSeconds(EXPIRES_IN))
                 .claim("scope", user.getRole())
                 .build();
 
         String jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 
-        return ResponseEntity.ok(new LoginResponse(jwtValue, expiresIn));
+        return ResponseEntity.ok(new LoginResponse(jwtValue, EXPIRES_IN));
     }
 
     private boolean isLoginCorrect(LoginRequest loginRequest, User user) {
