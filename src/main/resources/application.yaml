@@ -1,21 +1,8 @@
 spring:
   application:
     name: bompastor-api
-  datasource:
-    sqlScriptEncoding: UTF-8
-    username: sa
-    password:
-    url: jdbc:h2:mem:mydb
-    driverClassName: org.h2.Driver
-    sql:
-      init:
-        mode: always
-    h2:
-      console.enabled: true
-  jpa:
-    defer-datasource-initialization: true
-    show-sql: true
-
+  profiles:
+    active: h2
 jwt:
   public:
     key: classpath:security/app.pub

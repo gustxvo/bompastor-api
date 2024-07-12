@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    username: postgres
+    password: password
+    url: jdbc:postgresql://${HOST:localhost}:5432/operarios_db
+  jpa:
+    show-sql: true
