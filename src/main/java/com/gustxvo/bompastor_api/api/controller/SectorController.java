@@ -42,6 +42,17 @@ public class SectorController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{sectorId}/remove-worker")
+    public ResponseEntity<Void> removeWorker(
+            @PathVariable("sectorId") Integer sectorId, @RequestBody WorkerIdInput workerId) {
+        Sector sector = sectorRepository.findById(sectorId).orElseThrow();
+        User worker = userRepository.findById(workerId.uuid()).orElseThrow();
+        sector.removeWorker(worker);
+        sectorRepository.save(sector);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{sectorId}/available-workers")
     public ResponseEntity<Set<UserSummary>> listAvailableWorkers(@PathVariable("sectorId") Integer sectorId) {
         Set<UUID> workerIds = sectorRepository.findById(sectorId)

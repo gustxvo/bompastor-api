@@ -47,7 +47,7 @@ public class EventController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{eventId}")
+    @PatchMapping("/{eventId}")
     public ResponseEntity<EventDto> updateEvent(
             @PathVariable("eventId") Long eventId, @RequestBody EventInput eventInput) {
              Sector sector = sectorRepository.findById(eventInput.sectorId())

@@ -33,7 +33,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private UserRole role;
 
     public User(String name, String email, String password, UserRole role) {

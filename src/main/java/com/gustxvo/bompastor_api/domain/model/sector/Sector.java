@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -31,7 +32,7 @@ public class Sector {
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "tb_sectors_users",
+            name = "tb_sectors_workers",
             joinColumns = @JoinColumn(name = "sector_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
@@ -43,5 +44,9 @@ public class Sector {
 
     public void addWorker(User worker) {
         workers.add(worker);
+    }
+
+    public void removeWorker(User worker) {
+        workers.removeIf(user -> Objects.equals(user.getId(), worker.getId()));
     }
 }
