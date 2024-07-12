@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,8 +26,7 @@ public class EventController {
     private final SectorRepository sectorRepository;
     private final UserRepository userRepository;
 
-    @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
     public ResponseEntity<EventDto> createEvent(@RequestBody EventInput eventInput) {
         Sector sector = sectorRepository.findById(eventInput.sectorId()).orElseThrow();
         Set<User> workers = new HashSet<>(userRepository.findAllById(eventInput.workers()));
@@ -37,13 +37,21 @@ public class EventController {
         event.setDateTime(eventInput.dateTime());
 
         EventDto eventCreated = EventDto.fromEntity(eventRepository.save(event));
-        return ResponseEntity.ok(eventCreated);
+        return new ResponseEntity<>(eventCreated, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<EventDto> getEvent(@PathVariable("eventId") Long eventId) {
+        return eventRepository.findById(eventId)
+                .map(event -> ResponseEntity.ok(EventDto.fromEntity(event)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{eventId}")
-    public ResponseEntity<EventDto> update(
+    public ResponseEntity<EventDto> updateEvent(
             @PathVariable("eventId") Long eventId, @RequestBody EventInput eventInput) {
-        Sector sector = sectorRepository.findById(eventInput.sectorId()).orElseThrow();
+             Sector sector = sectorRepository.findById(eventInput.sectorId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Set<User> workers = new HashSet<>(userRepository.findAllById(eventInput.workers()));
 
         Event event = new Event();
@@ -52,8 +60,8 @@ public class EventController {
         event.setWorkers(workers);
         event.setDateTime(eventInput.dateTime());
 
-        EventDto eventCreated = EventDto.fromEntity(eventRepository.save(event));
-        return ResponseEntity.ok(eventCreated);
+        EventDto updatedEvent = EventDto.fromEntity(eventRepository.save(event));
+        return ResponseEntity.ok(updatedEvent);
     }
 
     @DeleteMapping("/{eventId}")

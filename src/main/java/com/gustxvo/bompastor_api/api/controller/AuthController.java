@@ -17,7 +17,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,7 +34,6 @@ public class AuthController {
     private static final int EXPIRES_IN = 86400;
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<UserDto> register(@RequestBody RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.email())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
@@ -46,9 +44,9 @@ public class AuthController {
                 .password(passwordEncoder.encode(registerRequest.password()))
                 .role(registerRequest.role())
                 .build();
-        User savedUser = userRepository.save(user);
+        UserDto savedUser = UserDto.fromEntity(userRepository.save(user));
 
-        return ResponseEntity.ok(UserDto.fromEntity(savedUser));
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

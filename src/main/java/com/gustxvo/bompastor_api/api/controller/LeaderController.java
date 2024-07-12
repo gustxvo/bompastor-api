@@ -4,7 +4,6 @@ import com.gustxvo.bompastor_api.api.model.event.EventDto;
 import com.gustxvo.bompastor_api.api.model.sector.SectorDto;
 import com.gustxvo.bompastor_api.domain.repository.EventRepository;
 import com.gustxvo.bompastor_api.domain.repository.SectorRepository;
-import com.gustxvo.bompastor_api.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -20,7 +19,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LeaderController {
 
-    private final UserRepository userRepository;
     private final SectorRepository sectorRepository;
     private final EventRepository eventRepository;
 
