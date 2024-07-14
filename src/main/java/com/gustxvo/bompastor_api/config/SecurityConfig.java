@@ -50,7 +50,7 @@ public class SecurityConfig {
         return http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/leader/**").hasAnyAuthority("SCOPE_ADMIN", "SCOPE_LEADER")
+                        .requestMatchers(HttpMethod.GET, "/leader/**").hasAnyAuthority("SCOPE_LEADER")
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated())
                 .headers(AbstractHttpConfigurer::disable)
