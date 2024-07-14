@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.3.1"
     id("io.spring.dependency-management") version "1.1.5"
+    id("com.google.cloud.tools.jib") version "3.4.3"
 }
 
 group = "com.gustxvo"
@@ -37,7 +38,7 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-//    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -50,4 +51,12 @@ tasks.withType<Test> {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+}
+
+tasks.bootBuildImage {
+    val application = rootProject.name
+    imageName.set("gustxvo/$application:$version")
+    docker {
+        host = "//./pipe/dockerDesktopLinuxEngine"
+    }
 }

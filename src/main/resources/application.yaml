@@ -3,6 +3,9 @@ spring:
     name: bompastor-api
   profiles:
     active: h2
+  docker:
+    compose:
+      enabled: false
 jwt:
   public:
     key: classpath:security/app.pub
