@@ -87,6 +87,9 @@ public class SectorController {
                 .map(User::getId)
                 .collect(Collectors.toSet());
 
+        List<UUID> adminIds = userRepository.findByRole(UserRole.ADMIN).stream().map(User::getId).toList();
+        workerIds.addAll(adminIds);
+
         Set<UserSummary> availableWorkers = userRepository.findAllByIdNotIn(workerIds).stream()
                 .map(UserSummary::fromEntity)
                 .collect(Collectors.toSet());

@@ -1,6 +1,7 @@
 package com.gustxvo.bompastor_api.domain.repository;
 
 import com.gustxvo.bompastor_api.domain.model.user.User;
+import com.gustxvo.bompastor_api.domain.model.user.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +18,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByEmail(String email);
 
     List<User> findAllByIdNotIn(Set<UUID> workerIds);
+
+    List<User> findByRole(UserRole role);
+
 }
