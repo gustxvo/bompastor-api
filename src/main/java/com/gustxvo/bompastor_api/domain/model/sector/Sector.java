@@ -2,20 +2,16 @@ package com.gustxvo.bompastor_api.domain.model.sector;
 
 import com.gustxvo.bompastor_api.domain.model.user.User;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "tb_sectors")
-@Getter
-@Setter
-@ToString
+@Table(name = "tb_sector")
+@Data
 @NoArgsConstructor
 public class Sector {
 
@@ -32,9 +28,9 @@ public class Sector {
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "tb_sectors_workers",
+            name = "tb_sector_worker",
             joinColumns = @JoinColumn(name = "sector_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "worker_id")
     )
     private Set<User> workers = new HashSet<>();
 

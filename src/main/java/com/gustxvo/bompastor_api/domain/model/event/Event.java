@@ -9,10 +9,9 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table(name = "tb_events")
+@Table(name = "tb_event")
 @Data
 @NoArgsConstructor
-@ToString
 public class Event {
 
     @Id
@@ -29,7 +28,7 @@ public class Event {
 
     @ManyToMany
     @JoinTable(
-            name = "tb_events_workers",
+            name = "tb_event_worker",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "worker_id")
     )
