@@ -1,9 +1,9 @@
 package com.gustxvo.bompastor_api.api.controller;
 
-import com.gustxvo.bompastor_api.api.model.NotificationMessage;
+import com.gustxvo.bompastor_api.api.model.notification.NotificationMessage;
 import com.gustxvo.bompastor_api.api.model.event.EventDto;
 import com.gustxvo.bompastor_api.api.model.event.EventInput;
-import com.gustxvo.bompastor_api.api.service.FirebaseMessagingService;
+import com.gustxvo.bompastor_api.api.service.MessagingService;
 import com.gustxvo.bompastor_api.domain.model.event.Event;
 import com.gustxvo.bompastor_api.domain.model.sector.Sector;
 import com.gustxvo.bompastor_api.domain.model.user.User;
@@ -13,12 +13,16 @@ import com.gustxvo.bompastor_api.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/events")
@@ -28,19 +32,23 @@ public class EventController {
     private final EventRepository eventRepository;
     private final SectorRepository sectorRepository;
     private final UserRepository userRepository;
-    private final FirebaseMessagingService messagingService;
+    private final MessagingService messagingService;
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(@RequestBody EventInput eventInput) {
         Sector sector = sectorRepository.findById(eventInput.sectorId()).orElseThrow();
         Set<User> workers = new HashSet<>(userRepository.findAllById(eventInput.workers()));
+        Set<UUID> workerIds = workers.stream().map(User::getId).collect(Collectors.toSet());
 
         Event event = new Event();
         event.setSector(sector);
         event.setWorkers(workers);
         event.setDateTime(eventInput.dateTime());
 
-        messagingService.sendNotificationByToken(new NotificationMessage(List.of(eventInput.token()), "Você possui uma nova atividade", "Você foi escalado para " + event.getSector().getName() + event.getDateTime()));
+        NotificationMessage notification = new NotificationMessage("Você foi escalado para servir: " + event.getSector().getName(),
+                formattedDate(event.getDateTime()));
+
+        messagingService.sendNotification(workerIds, notification);
 
         EventDto eventCreated = EventDto.fromEntity(eventRepository.save(event));
         return new ResponseEntity<>(eventCreated, HttpStatus.CREATED);
@@ -56,7 +64,7 @@ public class EventController {
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventDto> updateEvent(
             @PathVariable("eventId") Long eventId, @RequestBody EventInput eventInput) {
-             Sector sector = sectorRepository.findById(eventInput.sectorId())
+        Sector sector = sectorRepository.findById(eventInput.sectorId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Set<User> workers = new HashSet<>(userRepository.findAllById(eventInput.workers()));
 
@@ -76,6 +84,11 @@ public class EventController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.noContent().build();
+    }
+
+    private String formattedDate(LocalDateTime dateTime) {
+        DateTimeFormatter parser = DateTimeFormatter.ofPattern("EEEE dd/MM 'às' HH:mm");
+        return StringUtils.capitalize(parser.format(dateTime));
     }
 
 }

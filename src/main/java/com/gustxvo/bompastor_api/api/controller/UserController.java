@@ -1,12 +1,15 @@
 package com.gustxvo.bompastor_api.api.controller;
 
+import com.gustxvo.bompastor_api.api.model.notification.DeviceId;
+import com.gustxvo.bompastor_api.api.model.notification.UserNotificationTokenRequest;
 import com.gustxvo.bompastor_api.api.model.user.UserDto;
 import com.gustxvo.bompastor_api.api.model.user.UserProfileDto;
 import com.gustxvo.bompastor_api.domain.model.user.User;
+import com.gustxvo.bompastor_api.domain.model.user.UserNotificationToken;
+import com.gustxvo.bompastor_api.domain.repository.UserNotificationTokenRepository;
 import com.gustxvo.bompastor_api.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -23,6 +26,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final UserNotificationTokenRepository tokenRepository;
 
     @GetMapping
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
@@ -63,6 +67,7 @@ public class UserController {
         if (!userRepository.existsById(userId)) {
             return ResponseEntity.notFound().build();
         }
+        userRepository.deleteById(userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -70,4 +75,24 @@ public class UserController {
         return userRepository.existsByEmail(newEmail) && !Objects.equals(currentEmail, newEmail);
     }
 
+    @PostMapping("/allow-notifications")
+    public ResponseEntity<DeviceId> allowNotifications(JwtAuthenticationToken jwtToken, @RequestBody UserNotificationTokenRequest firebaseToken) {
+        UUID userId = UUID.fromString(jwtToken.getName());
+
+        User user = userRepository.findById(userId).orElseThrow();
+        UserNotificationToken userToken = new UserNotificationToken(firebaseToken.token(), user);
+
+        var token = tokenRepository.save(userToken);
+        DeviceId device = new DeviceId(token.getDeviceId());
+        return ResponseEntity.ok(device);
+    }
+
+    @DeleteMapping("/block-notifications/{deviceId}")
+    public ResponseEntity<Void> allowNotifications(@PathVariable("deviceId") Long deviceId) {
+        if (!tokenRepository.existsById(deviceId)) {
+            return ResponseEntity.notFound().build();
+        }
+        tokenRepository.deleteById(deviceId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -28,8 +28,7 @@ public class NotificationConfig {
     @Bean
     FirebaseApp firebaseApp() throws IOException {
         InputStream serviceAccount = accountKey.getInputStream();
-
-        FirebaseOptions options = new FirebaseOptions.Builder()
+        FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .build();
 
