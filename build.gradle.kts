@@ -32,6 +32,8 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
+    implementation("com.google.firebase:firebase-admin:9.3.0")
+
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.postgresql:postgresql")
     implementation("org.flywaydb:flyway-core")

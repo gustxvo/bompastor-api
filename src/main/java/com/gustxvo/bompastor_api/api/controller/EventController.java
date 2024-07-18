@@ -1,7 +1,9 @@
 package com.gustxvo.bompastor_api.api.controller;
 
+import com.gustxvo.bompastor_api.api.model.NotificationMessage;
 import com.gustxvo.bompastor_api.api.model.event.EventDto;
 import com.gustxvo.bompastor_api.api.model.event.EventInput;
+import com.gustxvo.bompastor_api.api.service.FirebaseMessagingService;
 import com.gustxvo.bompastor_api.domain.model.event.Event;
 import com.gustxvo.bompastor_api.domain.model.sector.Sector;
 import com.gustxvo.bompastor_api.domain.model.user.User;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -25,6 +28,7 @@ public class EventController {
     private final EventRepository eventRepository;
     private final SectorRepository sectorRepository;
     private final UserRepository userRepository;
+    private final FirebaseMessagingService messagingService;
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(@RequestBody EventInput eventInput) {
@@ -35,6 +39,8 @@ public class EventController {
         event.setSector(sector);
         event.setWorkers(workers);
         event.setDateTime(eventInput.dateTime());
+
+        messagingService.sendNotificationByToken(new NotificationMessage(List.of(eventInput.token()), "Você possui uma nova atividade", "Você foi escalado para " + event.getSector().getName() + event.getDateTime()));
 
         EventDto eventCreated = EventDto.fromEntity(eventRepository.save(event));
         return new ResponseEntity<>(eventCreated, HttpStatus.CREATED);

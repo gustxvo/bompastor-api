@@ -11,3 +11,6 @@ jwt:
     key: classpath:security/app.pub
   private:
     key: classpath:security/app.key
+firebase:
+  service:
+    account: classpath:security/service.json
