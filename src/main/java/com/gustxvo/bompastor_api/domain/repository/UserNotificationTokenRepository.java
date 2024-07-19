@@ -12,4 +12,5 @@ public interface UserNotificationTokenRepository extends JpaRepository<UserNotif
 
     Set<UserNotificationToken> findAllByUser_IdIn(Set<UUID> userIds);
 
+    boolean existsByToken(String token);
 }

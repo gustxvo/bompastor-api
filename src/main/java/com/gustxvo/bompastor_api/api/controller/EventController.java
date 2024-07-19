@@ -19,9 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,8 +43,14 @@ public class EventController {
         event.setWorkers(workers);
         event.setDateTime(eventInput.dateTime());
 
-        NotificationMessage notification = new NotificationMessage("Você foi escalado para servir: " + event.getSector().getName(),
-                formattedDate(event.getDateTime()));
+        String title = "Você foi escalado para servir: " + event.getSector().getName();
+        String body = formattedDate(event.getDateTime());
+        Map<String, String> data = new HashMap<>();
+        data.put("title", title);
+        data.put("icon", "https://imgur.com/vkdveuG.jpeg");
+        data.put("body", body);
+
+        NotificationMessage notification = new NotificationMessage(title, body, data);
 
         messagingService.sendNotification(workerIds, notification);
 

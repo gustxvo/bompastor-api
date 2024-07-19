@@ -1,4 +1,7 @@
 package com.gustxvo.bompastor_api.api.model.notification;
 
-public record NotificationMessage(String title, String body) {
+import java.util.Map;
+
+public record NotificationMessage(String title, String body, Map<String, String> data) {
+
 }

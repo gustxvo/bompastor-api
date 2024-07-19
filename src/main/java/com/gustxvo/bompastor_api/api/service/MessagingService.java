@@ -28,12 +28,14 @@ public class MessagingService {
         }
 
         Notification notification = Notification.builder()
-                .setTitle(notificationMessage.title())
-                .setBody(notificationMessage.body())
+//                .setImage("https://imgur.com/vkdveuG.jpeg")
+//                .setTitle(notificationMessage.title())
+//                .setBody(notificationMessage.body())
                 .build();
 
         MulticastMessage message = MulticastMessage.builder()
                 .addAllTokens(userTokens)
+                .putAllData(notificationMessage.data())
                 .setNotification(notification)
                 .build();
 

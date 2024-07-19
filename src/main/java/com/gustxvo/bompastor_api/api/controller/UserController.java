@@ -76,7 +76,11 @@ public class UserController {
     }
 
     @PostMapping("/allow-notifications")
-    public ResponseEntity<DeviceId> allowNotifications(JwtAuthenticationToken jwtToken, @RequestBody UserNotificationTokenRequest firebaseToken) {
+    public ResponseEntity<Object> allowNotifications(JwtAuthenticationToken jwtToken, @RequestBody UserNotificationTokenRequest firebaseToken) {
+        if (tokenRepository.existsByToken(firebaseToken.token())) {
+            return new ResponseEntity<>("Token já cadastrado", HttpStatus.BAD_REQUEST);
+        }
+
         UUID userId = UUID.fromString(jwtToken.getName());
 
         User user = userRepository.findById(userId).orElseThrow();
