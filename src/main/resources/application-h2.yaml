@@ -4,8 +4,11 @@ spring:
     password:
     url: jdbc:h2:mem:mydb
     driverClassName: org.h2.Driver
+  h2:
+    console:
+      enabled: false
   flyway:
-    enabled: false
+    enabled: true
   jpa:
     defer-datasource-initialization: true
     show-sql: true

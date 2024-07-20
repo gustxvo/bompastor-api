@@ -6,6 +6,9 @@ spring:
   docker:
     compose:
       enabled: false
+  h2:
+    console:
+      enabled: false
 jwt:
   public:
     key: classpath:security/app.pub

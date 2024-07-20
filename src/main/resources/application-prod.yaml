@@ -3,3 +3,13 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     url: ${DB_URL}
+  devtools:
+    enabled: false
+jwt:
+  public:
+    key: file:etc/secrets/app.pub
+  private:
+    key: file:etc/secrets/app.key
+firebase:
+  service:
+    account: file:etc/secrets/service.json
