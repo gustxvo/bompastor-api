@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class UserNotificationToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "device_id")
     private Long deviceId;
 

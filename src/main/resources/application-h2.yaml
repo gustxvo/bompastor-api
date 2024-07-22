@@ -6,9 +6,9 @@ spring:
     driverClassName: org.h2.Driver
   h2:
     console:
-      enabled: false
+      enabled: true
   flyway:
-    enabled: true
+    enabled: false
   jpa:
     defer-datasource-initialization: true
     show-sql: true
