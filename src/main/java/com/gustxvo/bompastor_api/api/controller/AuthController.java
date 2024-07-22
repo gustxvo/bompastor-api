@@ -31,7 +31,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    private static final int EXPIRES_IN = 86400;
+    private static final int EXPIRES_IN = 86400 * 30;
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody RegisterRequest registerRequest) {
