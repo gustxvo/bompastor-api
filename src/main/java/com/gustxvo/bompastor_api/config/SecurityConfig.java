@@ -35,6 +35,11 @@ import java.security.interfaces.RSAPublicKey;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    /**
+     * 7 days in seconds
+     */
+    public static final int JWT_EXPIRATION_IN_SECONDS = 604_800;
+
     @Value("${jwt.public.key}")
     private RSAPublicKey publicKey;
 
