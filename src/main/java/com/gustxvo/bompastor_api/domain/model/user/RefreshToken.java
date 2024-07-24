@@ -2,31 +2,36 @@ package com.gustxvo.bompastor_api.domain.model.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Entity
-@Table(name = "tb_notification_token")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserNotificationToken {
+@Builder
+@Table(name = "tb_refresh_token")
+public class RefreshToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "device_id")
-    private Long deviceId;
+    @Column(name = "refresh_token_id")
+    private Integer id;
 
-    @Column(unique = true)
     private String token;
+
+    @Column(name = "expiration_date")
+    private Instant expirationDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    public UserNotificationToken(String token, User user) {
-        this.token = token;
-        this.user = user;
+    public boolean isExpired() {
+        return expirationDate.isBefore(Instant.now());
     }
 
 }

@@ -1,9 +1,12 @@
 package com.gustxvo.bompastor_api.api.controller;
 
+import com.gustxvo.bompastor_api.api.model.auth.JwtTokenResponseDto;
 import com.gustxvo.bompastor_api.api.model.auth.LoginRequest;
-import com.gustxvo.bompastor_api.api.model.auth.LoginResponse;
+import com.gustxvo.bompastor_api.api.model.auth.RefreshTokenRequest;
 import com.gustxvo.bompastor_api.api.model.auth.RegisterRequest;
 import com.gustxvo.bompastor_api.api.model.user.UserDto;
+import com.gustxvo.bompastor_api.api.service.RefreshTokenService;
+import com.gustxvo.bompastor_api.domain.model.user.RefreshToken;
 import com.gustxvo.bompastor_api.domain.model.user.User;
 import com.gustxvo.bompastor_api.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 
+import static com.gustxvo.bompastor_api.config.SecurityConfig.JWT_EXPIRATION_IN_SECONDS;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -30,8 +35,7 @@ public class AuthController {
     private final JwtEncoder jwtEncoder;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
-    private static final int EXPIRES_IN = 86400 * 30;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody RegisterRequest registerRequest) {
@@ -50,27 +54,44 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtTokenResponseDto> login(@RequestBody LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.email())
                 .filter(credentials -> isLoginCorrect(loginRequest, credentials))
                 .orElseThrow(() -> new BadCredentialsException("User or password is invalid"));
 
+        String accessToken = generateJwtToken(user);
+        RefreshToken refreshToken = refreshTokenService.generateRefreshToken(user.getId());
+
+        return ResponseEntity.ok(new JwtTokenResponseDto(accessToken, refreshToken.getToken(), JWT_EXPIRATION_IN_SECONDS));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<JwtTokenResponseDto> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenRequest.token())
+                .map(refreshTokenService::validateToken)
+                .orElseThrow();
+
+        String accessToken = generateJwtToken(refreshToken.getUser());
+
+        return ResponseEntity.ok(new JwtTokenResponseDto(accessToken, refreshToken.getToken(), JWT_EXPIRATION_IN_SECONDS));
+    }
+
+    private boolean isLoginCorrect(LoginRequest loginRequest, User user) {
+        return passwordEncoder.matches(loginRequest.password(), user.getPassword());
+    }
+
+    private String generateJwtToken(User user) {
         Instant now = Instant.now();
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("bompastor-api")
                 .subject(user.getId().toString())
                 .issuedAt(now)
-                .expiresAt(now.plusSeconds(EXPIRES_IN))
+                .expiresAt(now.plusSeconds(JWT_EXPIRATION_IN_SECONDS))
                 .claim("scope", user.getRole())
                 .build();
 
-        String jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-
-        return ResponseEntity.ok(new LoginResponse(jwtValue, EXPIRES_IN));
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-    private boolean isLoginCorrect(LoginRequest loginRequest, User user) {
-        return passwordEncoder.matches(loginRequest.password(), user.getPassword());
-    }
 }
