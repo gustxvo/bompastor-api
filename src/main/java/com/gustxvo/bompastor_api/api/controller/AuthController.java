@@ -1,10 +1,8 @@
 package com.gustxvo.bompastor_api.api.controller;
 
-import com.gustxvo.bompastor_api.api.model.auth.JwtTokenResponseDto;
-import com.gustxvo.bompastor_api.api.model.auth.LoginRequest;
-import com.gustxvo.bompastor_api.api.model.auth.RefreshTokenRequest;
-import com.gustxvo.bompastor_api.api.model.auth.RegisterRequest;
+import com.gustxvo.bompastor_api.api.model.auth.*;
 import com.gustxvo.bompastor_api.api.model.user.UserDto;
+import com.gustxvo.bompastor_api.api.service.LogoutService;
 import com.gustxvo.bompastor_api.api.service.RefreshTokenService;
 import com.gustxvo.bompastor_api.domain.model.user.RefreshToken;
 import com.gustxvo.bompastor_api.domain.model.user.User;
@@ -36,6 +34,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
+    private final LogoutService logoutService;
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody RegisterRequest registerRequest) {
@@ -68,12 +67,18 @@ public class AuthController {
     @PostMapping("/refresh-token")
     public ResponseEntity<JwtTokenResponseDto> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
         RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenRequest.token())
-                .map(refreshTokenService::validateToken)
+                .map(refreshTokenService::invalidateToken)
                 .orElseThrow();
 
         String accessToken = generateJwtToken(refreshToken.getUser());
 
         return ResponseEntity.ok(new JwtTokenResponseDto(accessToken, refreshToken.getToken(), JWT_EXPIRATION_IN_SECONDS));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody LogoutRequest logoutRequest) {
+        logoutService.logout(logoutRequest.deviceId(), logoutRequest.refreshToken().toString());
+        return ResponseEntity.noContent().build();
     }
 
     private boolean isLoginCorrect(LoginRequest loginRequest, User user) {

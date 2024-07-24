@@ -36,12 +36,12 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(refreshToken);
     }
 
-    public RefreshToken validateToken(RefreshToken token) {
+    public RefreshToken invalidateToken(RefreshToken token) {
+        refreshTokenRepository.deleteById(token.getId());
         if (token.isExpired()) {
-            refreshTokenRepository.deleteById(token.getId());
-            return generateRefreshToken(token.getUser().getId());
+            throw new IllegalStateException(token.getToken() + " Refresh token expired. Please log in again");
         }
-        return token;
+        return generateRefreshToken(token.getUser().getId());
     }
 
     private Instant expirationDate() {
