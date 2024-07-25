@@ -38,7 +38,7 @@ public class SecurityConfig {
     /**
      * 7 days in seconds
      */
-    public static final int JWT_EXPIRATION_IN_SECONDS = 604_800;
+    public static final int JWT_EXPIRATION_IN_SECONDS = 120;
 
     @Value("${jwt.public.key}")
     private RSAPublicKey publicKey;
