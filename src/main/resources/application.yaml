@@ -1,6 +1,6 @@
 spring:
   application:
-    name: bompastor-api
+    name: operarios-api
   profiles:
     active: h2
   docker:

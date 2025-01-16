@@ -1,0 +1,37 @@
+package br.com.gustavoalmeidacarvalho.operariosapi.domain.model.event;
+
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.sector.Sector;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+
+@Entity
+@Table(name = "tb_event")
+@Data
+@NoArgsConstructor
+public class Event {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "event_id")
+    private Long id;
+
+    @Column(name = "date_time")
+    private LocalDateTime dateTime;
+
+    @ManyToOne
+    @JoinColumn(name = "sector_id")
+    private Sector sector;
+
+    @ManyToMany
+    @JoinTable(
+            name = "tb_event_worker",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "worker_id")
+    )
+    private Set<User> workers;
+
+}
