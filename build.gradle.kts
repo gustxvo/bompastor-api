@@ -1,8 +1,8 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.3.1"
-    id("io.spring.dependency-management") version "1.1.5"
-    id("com.google.cloud.tools.jib") version "3.4.3"
+    id("org.springframework.boot") version "3.4.1"
+    id("io.spring.dependency-management") version "1.1.7"
+    id("com.google.cloud.tools.jib") version "3.4.4"
 }
 
 group = "br.com.gustavoalmeidacarvalho"
@@ -32,7 +32,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    implementation("com.google.firebase:firebase-admin:9.3.0")
+    implementation("com.google.firebase:firebase-admin:9.4.2")
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.postgresql:postgresql")
