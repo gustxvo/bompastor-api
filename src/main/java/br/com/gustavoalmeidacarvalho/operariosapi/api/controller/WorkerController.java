@@ -2,8 +2,8 @@ package br.com.gustavoalmeidacarvalho.operariosapi.api.controller;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventSummary;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.WorkerNames;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.UserRole;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.EventRepository;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WorkerController {
 
-    private final EventRepository eventRepository;
+    private final EventService eventService;
     private final UserRepository userRepository;
 
     @GetMapping
@@ -32,10 +32,10 @@ public class WorkerController {
     public List<EventSummary> list(JwtAuthenticationToken token) {
         UUID workerId = UUID.fromString(token.getName());
 
-        return eventRepository
-                .findAllByWorkers_Id(workerId)
+        return eventService
+                .findAllByWorkerId(workerId)
                 .stream()
-                .map(EventSummary::fromEntity)
+                .map(EventSummary::fromDomain)
                 .toList();
     }
 }

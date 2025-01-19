@@ -2,7 +2,7 @@ package br.com.gustavoalmeidacarvalho.operariosapi.api.controller;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.sector.SectorDto;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.EventRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.SectorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class LeaderController {
 
     private final SectorRepository sectorRepository;
-    private final EventRepository eventRepository;
+    private final EventService eventService;
 
     @GetMapping("/sector")
     public ResponseEntity<SectorDto> sector(JwtAuthenticationToken token) {
@@ -37,8 +37,8 @@ public class LeaderController {
     public List<EventDto> events(JwtAuthenticationToken token) {
         UUID leaderId = UUID.fromString(token.getName());
 
-        return eventRepository.findAllBySectorLeaderId(leaderId).stream()
-                .map(EventDto::fromEntity)
+        return eventService.findAllBySectorLeaderId(leaderId).stream()
+                .map(EventDto::fromDomain)
                 .toList();
     }
 

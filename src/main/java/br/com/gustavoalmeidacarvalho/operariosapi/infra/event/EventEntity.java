@@ -1,5 +1,6 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.domain.model.event;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.event;
 
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.Event;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.sector.Sector;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import java.util.Set;
 @Table(name = "tb_event")
 @Data
 @NoArgsConstructor
-public class Event {
+public class EventEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,5 +34,16 @@ public class Event {
             inverseJoinColumns = @JoinColumn(name = "worker_id")
     )
     private Set<User> workers;
+
+    public EventEntity(Event event) {
+        this.id = event.id();
+        this.dateTime = event.dateTime();
+        this.sector = event.sector();
+        this.workers = event.workers();
+    }
+
+    public Event toModel() {
+        return new Event(id, dateTime, sector,workers);
+    }
 
 }
