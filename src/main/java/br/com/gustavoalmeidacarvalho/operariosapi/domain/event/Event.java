@@ -1,7 +1,7 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.domain.event;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 
 import java.time.LocalDateTime;
 import java.util.Set;

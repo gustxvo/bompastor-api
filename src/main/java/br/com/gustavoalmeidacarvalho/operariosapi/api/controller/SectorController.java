@@ -4,9 +4,9 @@ import br.com.gustavoalmeidacarvalho.operariosapi.api.model.sector.LeaderIdInput
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.sector.SectorDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.sector.WorkerIdInput;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserSummary;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.UserRole;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.UserRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SectorController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final SectorService sectorService;
 
     @GetMapping
@@ -54,8 +54,8 @@ public class SectorController {
         Sector sector = sectorService.findById(sectorId)
                 .orElseThrow(() -> new IllegalStateException("Sector not found"));
 
-        User leader = userRepository.findById(leaderId.uuid())
-                .filter(user -> user.getRole() == UserRole.LEADER)
+        User leader = userService.findById(leaderId.uuid())
+                .filter(user -> user.role() == UserRole.LEADER)
                 .orElseThrow(() -> new IllegalStateException("Leader not found"));
 
         sectorService.changeLeader(sector, leader);
@@ -67,7 +67,7 @@ public class SectorController {
     public ResponseEntity<Void> addWorker(
             @PathVariable("sectorId") Integer sectorId, @RequestBody WorkerIdInput workerId) {
         Sector sector = sectorService.findById(sectorId).orElseThrow();
-        User worker = userRepository.findById(workerId.uuid()).orElseThrow();
+        User worker = userService.findById(workerId.uuid()).orElseThrow();
 
         sectorService.addWorker(sector, worker);
 
@@ -78,7 +78,7 @@ public class SectorController {
     public ResponseEntity<Void> removeWorker(
             @PathVariable("sectorId") Integer sectorId, @RequestBody WorkerIdInput workerId) {
         Sector sector = sectorService.findById(sectorId).orElseThrow();
-        User worker = userRepository.findById(workerId.uuid()).orElseThrow();
+        User worker = userService.findById(workerId.uuid()).orElseThrow();
 
         sectorService.removeWorker(sector, worker);
 
@@ -90,13 +90,13 @@ public class SectorController {
         Set<UUID> workerIds = sectorService.findById(sectorId)
                 .orElseThrow(() -> new IllegalStateException("Sector not found"))
                 .workers().stream()
-                .map(User::getId)
+                .map(User::id)
                 .collect(Collectors.toSet());
 
-        List<UUID> adminIds = userRepository.findByRole(UserRole.ADMIN).stream().map(User::getId).toList();
+        List<UUID> adminIds = userService.findByRole(UserRole.ADMIN).stream().map(User::id).toList();
         workerIds.addAll(adminIds);
 
-        Set<UserSummary> availableWorkers = userRepository.findAllByIdNotIn(workerIds).stream()
+        Set<UserSummary> availableWorkers = userService.getAvailableWorkers(workerIds).stream()
                 .map(UserSummary::fromEntity)
                 .collect(Collectors.toSet());
 

@@ -1,5 +1,7 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.user;
 
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -33,14 +35,16 @@ public class User {
     @Enumerated(EnumType.ORDINAL)
     private UserRole role;
 
-    public User(String name, String email, String password, UserRole role) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
+    public UserEntity(User user) {
+        this.id = user.id();
+        this.name = user.name();
+        this.email = user.email();
+        this.password = user.password();
+        this.role = user.role();
     }
 
-    public User(UUID workerId) {
-        this.id = workerId;
+    public User toModel() {
+        return new User(id, name, email, password, role);
     }
+
 }

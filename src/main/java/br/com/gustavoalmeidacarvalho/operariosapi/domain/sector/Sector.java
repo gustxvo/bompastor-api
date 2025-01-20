@@ -1,6 +1,6 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.domain.sector;
 
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 
 import java.util.Set;
 

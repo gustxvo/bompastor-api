@@ -1,6 +1,6 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.infra.sector;
 
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorRepository;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
@@ -47,7 +47,7 @@ public class SectorServiceImpl implements SectorService {
 
     @Override
     public void removeWorker(Sector sector, User worker) {
-        sector.workers().removeIf(user -> Objects.equals(user.getId(), worker.getId()));
+        sector.workers().removeIf(user -> Objects.equals(user.id(), worker.id()));
         sectorRepository.save(sector);
     }
 

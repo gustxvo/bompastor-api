@@ -1,9 +1,9 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.api.service;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.RefreshToken;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.RefreshTokenRepository;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.UserRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class RefreshTokenService {
     private final UserRepository userRepository;
 
     public RefreshToken generateRefreshToken(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow();
+        UserEntity user = userRepository.findById(userId).orElseThrow();
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)

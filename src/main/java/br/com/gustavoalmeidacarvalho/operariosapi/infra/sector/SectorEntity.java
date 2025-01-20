@@ -1,13 +1,15 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.infra.sector;
 
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tb_sector")
@@ -24,7 +26,7 @@ public class SectorEntity {
 
     @ManyToOne
     @JoinColumn(name = "leader_id")
-    private User leader;
+    private UserEntity leader;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -32,16 +34,20 @@ public class SectorEntity {
             joinColumns = @JoinColumn(name = "sector_id"),
             inverseJoinColumns = @JoinColumn(name = "worker_id")
     )
-    private Set<User> workers = new HashSet<>();
+    private Set<UserEntity> workers = new HashSet<>();
 
     public SectorEntity(Sector sector) {
         this.id = sector.id();
         this.name = sector.name();
-        this.leader = sector.leader();
-        this.workers = sector.workers();
+        this.leader = new UserEntity(sector.leader());
+        this.workers = sector.workers().stream()
+                .map(UserEntity::new)
+                .collect(Collectors.toSet());;
     }
 
     public Sector toModel() {
+        User leader = this.leader.toModel();
+        Set<User> workers = this.workers.stream().map(UserEntity::toModel).collect(Collectors.toSet());
         return new Sector(id, name, leader, workers);
     }
 

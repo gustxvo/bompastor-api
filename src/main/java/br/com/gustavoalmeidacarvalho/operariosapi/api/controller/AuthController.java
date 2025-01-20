@@ -9,8 +9,8 @@ import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.service.LogoutService;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.service.RefreshTokenService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.RefreshToken;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.UserRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,37 +35,42 @@ import static br.com.gustavoalmeidacarvalho.operariosapi.config.SecurityConfig.J
 public class AuthController {
 
     private final JwtEncoder jwtEncoder;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final LogoutService logoutService;
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody RegisterRequest registerRequest) {
-        if (userRepository.existsByEmail(registerRequest.email())) {
+        if (userService.existsByEmail(registerRequest.email())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        User user = User.builder()
-                .name(registerRequest.name())
-                .email(registerRequest.email())
-                .password(passwordEncoder.encode(registerRequest.password()))
-                .role(registerRequest.role())
-                .build();
-        UserDto savedUser = UserDto.fromEntity(userRepository.save(user));
+        User user = User.create(
+                registerRequest.name(),
+                registerRequest.email(),
+                passwordEncoder.encode(registerRequest.password()),
+                registerRequest.role()
+        );
+
+        UserDto savedUser = UserDto.fromDomain(userService.save(user));
 
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<JwtTokenResponseDto> login(@RequestBody LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.email())
-                .filter(credentials -> isLoginCorrect(loginRequest, credentials))
+        User user = userService.findByEmail(loginRequest.email())
+                .filter(userCredentials -> isLoginCorrect(loginRequest, userCredentials))
                 .orElseThrow(() -> new BadCredentialsException("User or password is invalid"));
 
         String accessToken = generateJwtToken(user);
-        RefreshToken refreshToken = refreshTokenService.generateRefreshToken(user.getId());
+        RefreshToken refreshToken = refreshTokenService.generateRefreshToken(user.id());
 
-        return ResponseEntity.ok(new JwtTokenResponseDto(accessToken, refreshToken.getToken(), JWT_EXPIRATION_IN_SECONDS));
+        return ResponseEntity.ok(new JwtTokenResponseDto(
+                accessToken,
+                refreshToken.getToken(),
+                JWT_EXPIRATION_IN_SECONDS
+        ));
     }
 
     @PostMapping("/refresh-token")
@@ -74,9 +79,13 @@ public class AuthController {
                 .map(refreshTokenService::invalidateToken)
                 .orElseThrow();
 
-        String accessToken = generateJwtToken(refreshToken.getUser());
+        String accessToken = generateJwtToken(refreshToken.getUser().toModel());
 
-        return ResponseEntity.ok(new JwtTokenResponseDto(accessToken, refreshToken.getToken(), JWT_EXPIRATION_IN_SECONDS));
+        return ResponseEntity.ok(new JwtTokenResponseDto(
+                accessToken,
+                refreshToken.getToken(),
+                JWT_EXPIRATION_IN_SECONDS
+        ));
     }
 
     @PostMapping("/logout")
@@ -86,7 +95,7 @@ public class AuthController {
     }
 
     private boolean isLoginCorrect(LoginRequest loginRequest, User user) {
-        return passwordEncoder.matches(loginRequest.password(), user.getPassword());
+        return passwordEncoder.matches(loginRequest.password(), user.password());
     }
 
     private String generateJwtToken(User user) {
@@ -94,10 +103,10 @@ public class AuthController {
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("bompastor-api")
-                .subject(user.getId().toString())
+                .subject(user.id().toString())
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(JWT_EXPIRATION_IN_SECONDS))
-                .claim("scope", user.getRole())
+                .claim("scope", user.role())
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

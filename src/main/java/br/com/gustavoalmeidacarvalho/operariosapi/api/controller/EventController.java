@@ -6,8 +6,8 @@ import br.com.gustavoalmeidacarvalho.operariosapi.api.service.MessagingService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.Event;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.UserRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,15 +28,15 @@ public class EventController {
 
     private final EventService eventService;
     private final SectorService sectorService;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final MessagingService messagingService;
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(@RequestBody EventInput eventInput) {
         Sector sector = sectorService.findById(eventInput.sectorId())
                 .orElseThrow(() -> new IllegalStateException("Sector not found"));
-        Set<User> workers = new HashSet<>(userRepository.findAllById(eventInput.workers()));
-        Set<UUID> workerIds = workers.stream().map(User::getId).collect(Collectors.toSet());
+        Set<User> workers = new HashSet<>(userService.findAllById(eventInput.workers()));
+        Set<UUID> workerIds = workers.stream().map(User::id).collect(Collectors.toSet());
 
         Event event = Event.create(eventInput.dateTime(), sector, workers);
 
@@ -67,7 +67,7 @@ public class EventController {
             @PathVariable("eventId") Long eventId, @RequestBody EventInput eventInput) {
         Sector sector = sectorService.findById(eventInput.sectorId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        Set<User> workers = new HashSet<>(userRepository.findAllById(eventInput.workers()));
+        Set<User> workers = new HashSet<>(userService.findAllById(eventInput.workers()));
 
         Event event = new Event(eventId, eventInput.dateTime(), sector, workers);
 

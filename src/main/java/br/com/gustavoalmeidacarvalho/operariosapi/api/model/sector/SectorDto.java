@@ -12,10 +12,10 @@ public record SectorDto(@JsonProperty("sector_id") Integer id, @JsonProperty("se
                         @JsonProperty("leader_id") UUID leaderId, @JsonProperty("workers") Set<UserSummary> workers) {
 
     public static SectorDto fromDomain(Sector sector) {
-        UUID leaderId = sector.leader().getId();
+        UUID leaderId = sector.leader().id();
 
         Set<UserSummary> workers = sector.workers().stream()
-                .map((worker) -> new UserSummary(worker.getId(), worker.getName(), worker.getEmail()))
+                .map((worker) -> new UserSummary(worker.id(), worker.name(), worker.email()))
                 .collect(Collectors.toSet());
 
         return new SectorDto(sector.id(), sector.name(), leaderId, workers);

@@ -1,5 +1,7 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user;
 
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,9 +24,9 @@ public class UserNotificationToken {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
 
-    public UserNotificationToken(String token, User user) {
+    public UserNotificationToken(String token, UserEntity user) {
         this.token = token;
         this.user = user;
     }

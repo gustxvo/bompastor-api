@@ -1,5 +1,7 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user;
 
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +30,7 @@ public class RefreshToken {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
 
     public boolean isExpired() {
         return expirationDate.isBefore(Instant.now());
