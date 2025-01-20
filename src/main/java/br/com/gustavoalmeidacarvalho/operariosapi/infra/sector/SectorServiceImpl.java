@@ -1,6 +1,9 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.domain.sector;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.sector;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

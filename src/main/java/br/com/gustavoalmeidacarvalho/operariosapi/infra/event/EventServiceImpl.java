@@ -1,5 +1,8 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.domain.event;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.event;
 
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.Event;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
