@@ -6,9 +6,9 @@ import br.com.gustavoalmeidacarvalho.operariosapi.api.model.auth.LogoutRequest;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.auth.RefreshTokenRequest;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.auth.RegisterRequest;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserDto;
-import br.com.gustavoalmeidacarvalho.operariosapi.api.service.LogoutService;
-import br.com.gustavoalmeidacarvalho.operariosapi.api.service.RefreshTokenService;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.RefreshToken;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.LogoutService;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.auth.RefreshTokenServiceImpl;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.auth.RefreshTokenEntity;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class AuthController {
     private final JwtEncoder jwtEncoder;
     private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenServiceImpl refreshTokenService;
     private final LogoutService logoutService;
 
     @PostMapping("/register")
@@ -64,7 +64,7 @@ public class AuthController {
                 .orElseThrow(() -> new BadCredentialsException("User or password is invalid"));
 
         String accessToken = generateJwtToken(user);
-        RefreshToken refreshToken = refreshTokenService.generateRefreshToken(user.id());
+        RefreshTokenEntity refreshToken = refreshTokenService.generateRefreshToken(user.id());
 
         return ResponseEntity.ok(new JwtTokenResponseDto(
                 accessToken,
@@ -75,7 +75,7 @@ public class AuthController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<JwtTokenResponseDto> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
-        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenRequest.token())
+        RefreshTokenEntity refreshToken = refreshTokenService.findByToken(refreshTokenRequest.token())
                 .map(refreshTokenService::invalidateToken)
                 .orElseThrow();
 

@@ -4,11 +4,10 @@ import br.com.gustavoalmeidacarvalho.operariosapi.api.model.notification.DeviceI
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.notification.UserNotificationTokenRequest;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserProfileDto;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.UserNotificationToken;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.UserNotificationTokenService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.UserNotificationToken;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.UserNotificationTokenRepository;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
-import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-    private final UserNotificationTokenRepository tokenRepository;
+    private final UserNotificationTokenService notificationTokenService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
@@ -40,7 +39,8 @@ public class UserController {
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> findById(@PathVariable("userId") String userId) {
-        User user = userService.findById(UUID.fromString(userId)).orElseThrow(() -> new RuntimeException("User not found"));
+        User user =
+                userService.findById(UUID.fromString(userId)).orElseThrow(() -> new RuntimeException("User not found"));
         return ResponseEntity.ok(UserDto.fromDomain(user));
     }
 
@@ -51,7 +51,10 @@ public class UserController {
     }
 
     @PatchMapping("/profile")
-    public ResponseEntity<UserProfileDto> editProfile(@RequestBody UserProfileDto profile, JwtAuthenticationToken token) {
+    public ResponseEntity<UserProfileDto> editProfile(
+            @RequestBody UserProfileDto profile,
+            JwtAuthenticationToken token
+    ) {
         User user = userService.findById(UUID.fromString(token.getName()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY));
         if (!emailIsAvailable(profile.email(), user.email())) {
@@ -77,27 +80,30 @@ public class UserController {
     }
 
     @PostMapping("/allow-notifications")
-    public ResponseEntity<Object> allowNotifications(JwtAuthenticationToken jwtToken, @RequestBody UserNotificationTokenRequest firebaseToken) {
-        if (tokenRepository.existsByToken(firebaseToken.token())) {
+    public ResponseEntity<Object> allowNotifications(
+            JwtAuthenticationToken jwtToken,
+            @RequestBody UserNotificationTokenRequest firebaseToken
+    ) {
+        if (notificationTokenService.existsByToken(firebaseToken.token())) {
             return new ResponseEntity<>("Token já cadastrado", HttpStatus.BAD_REQUEST);
         }
 
         UUID userId = UUID.fromString(jwtToken.getName());
 
         User user = userService.findById(userId).orElseThrow();
-        UserNotificationToken userToken = new UserNotificationToken(firebaseToken.token(), new UserEntity(user));
+        UserNotificationToken userToken = UserNotificationToken.create(firebaseToken.token(), user.id());
 
-        var token = tokenRepository.save(userToken);
-        DeviceId device = new DeviceId(token.getDeviceId());
+        var token = notificationTokenService.save(userToken);
+        DeviceId device = new DeviceId(token.deviceId());
         return ResponseEntity.ok(device);
     }
 
     @DeleteMapping("/block-notifications/{deviceId}")
     public ResponseEntity<Void> allowNotifications(@PathVariable("deviceId") Long deviceId) {
-        if (!tokenRepository.existsById(deviceId)) {
+        if (!notificationTokenService.existsById(deviceId)) {
             return ResponseEntity.notFound().build();
         }
-        tokenRepository.deleteById(deviceId);
+        notificationTokenService.deleteById(deviceId);
         return ResponseEntity.noContent().build();
     }
 }

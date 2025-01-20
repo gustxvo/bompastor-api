@@ -2,7 +2,7 @@ package br.com.gustavoalmeidacarvalho.operariosapi.api.controller;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventInput;
-import br.com.gustavoalmeidacarvalho.operariosapi.api.service.MessagingService;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.notification.MessagingService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.Event;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;

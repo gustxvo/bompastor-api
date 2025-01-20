@@ -35,6 +35,10 @@ public class UserEntity {
     @Enumerated(EnumType.ORDINAL)
     private UserRole role;
 
+    public UserEntity(UUID userId) {
+        this.id = userId;
+    }
+
     public UserEntity(User user) {
         this.id = user.id();
         this.name = user.name();

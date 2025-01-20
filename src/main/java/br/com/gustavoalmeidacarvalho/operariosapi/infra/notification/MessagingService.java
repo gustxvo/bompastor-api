@@ -1,12 +1,12 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.api.service;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.notification;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.Notification;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.notification.NotificationMessage;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.UserNotificationToken;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.UserNotificationTokenRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.auth.UserNotificationTokenEntity;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.auth.UserNotificationTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +48,7 @@ public class MessagingService {
 
     private Set<String> userNotificationTokens(Set<UUID> users) {
         return tokenRepository.findAllByUser_IdIn(users).stream()
-                .map(UserNotificationToken::getToken)
+                .map(UserNotificationTokenEntity::getToken)
                 .collect(Collectors.toSet());
     }
 

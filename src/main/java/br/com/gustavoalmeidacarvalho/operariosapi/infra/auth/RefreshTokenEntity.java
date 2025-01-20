@@ -1,6 +1,5 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.auth;
 
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +15,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 @Table(name = "tb_refresh_token")
-public class RefreshToken {
+public class RefreshTokenEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

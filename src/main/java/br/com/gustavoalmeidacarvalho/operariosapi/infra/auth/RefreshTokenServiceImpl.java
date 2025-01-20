@@ -1,7 +1,6 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.api.service;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.auth;
 
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.RefreshToken;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.RefreshTokenRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.RefreshTokenService;
 import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
 import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -15,15 +14,16 @@ import static br.com.gustavoalmeidacarvalho.operariosapi.api.model.auth.JwtToken
 
 @Service
 @AllArgsConstructor
-public class RefreshTokenService {
+public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
-    public RefreshToken generateRefreshToken(UUID userId) {
+    @Override
+    public RefreshTokenEntity generateRefreshToken(UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow();
 
-        RefreshToken refreshToken = RefreshToken.builder()
+        RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
                 .user(user)
                 .token(UUID.randomUUID().toString())
                 .expirationDate(expirationDate())
@@ -32,11 +32,13 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-    public Optional<RefreshToken> findByToken(String refreshToken) {
+    @Override
+    public Optional<RefreshTokenEntity> findByToken(String refreshToken) {
         return refreshTokenRepository.findByToken(refreshToken);
     }
 
-    public RefreshToken invalidateToken(RefreshToken token) {
+    @Override
+    public RefreshTokenEntity invalidateToken(RefreshTokenEntity token) {
         refreshTokenRepository.deleteById(token.getId());
         if (token.isExpired()) {
             throw new IllegalStateException(token.getToken() + " Refresh token expired. Please log in again");
@@ -44,7 +46,8 @@ public class RefreshTokenService {
         return generateRefreshToken(token.getUser().getId());
     }
 
-    private Instant expirationDate() {
+    @Override
+    public Instant expirationDate() {
         return Instant.now().plusSeconds(REFRESH_TOKEN_EXPIRATION_IN_SECONDS);
     }
 
