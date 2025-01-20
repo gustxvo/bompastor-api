@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 
@@ -42,9 +41,6 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody RegisterRequest registerRequest) {
-        if (userService.existsByEmail(registerRequest.email())) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
         User user = User.create(
                 registerRequest.name(),
                 registerRequest.email(),
