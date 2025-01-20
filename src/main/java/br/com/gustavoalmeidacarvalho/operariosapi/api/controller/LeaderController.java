@@ -3,7 +3,7 @@ package br.com.gustavoalmeidacarvalho.operariosapi.api.controller;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.sector.SectorDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventService;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.SectorRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -19,15 +19,15 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LeaderController {
 
-    private final SectorRepository sectorRepository;
+    private final SectorService sectorService;
     private final EventService eventService;
 
     @GetMapping("/sector")
     public ResponseEntity<SectorDto> sector(JwtAuthenticationToken token) {
         UUID leaderId = UUID.fromString(token.getName());
-        SectorDto sector = sectorRepository.findByLeaderId(leaderId).stream()
+        SectorDto sector = sectorService.findByLeaderId(leaderId).stream()
                 .findFirst()
-                .map(SectorDto::fromEntity)
+                .map(SectorDto::fromDomain)
                 .orElseThrow(() -> new IllegalStateException("Sector with no leader"));
 
         return ResponseEntity.ok(sector);

@@ -1,15 +1,14 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.api.controller;
 
-import br.com.gustavoalmeidacarvalho.operariosapi.api.model.notification.NotificationMessage;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventInput;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.service.MessagingService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.Event;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventService;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.sector.Sector;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.SectorRepository;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.repository.UserRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,19 +27,20 @@ import java.util.stream.Collectors;
 public class EventController {
 
     private final EventService eventService;
-    private final SectorRepository sectorRepository;
+    private final SectorService sectorService;
     private final UserRepository userRepository;
     private final MessagingService messagingService;
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(@RequestBody EventInput eventInput) {
-        Sector sector = sectorRepository.findById(eventInput.sectorId()).orElseThrow();
+        Sector sector = sectorService.findById(eventInput.sectorId())
+                .orElseThrow(() -> new IllegalStateException("Sector not found"));
         Set<User> workers = new HashSet<>(userRepository.findAllById(eventInput.workers()));
         Set<UUID> workerIds = workers.stream().map(User::getId).collect(Collectors.toSet());
 
         Event event = Event.create(eventInput.dateTime(), sector, workers);
 
-        String title = "Você foi escalado para servir: " + event.sector().getName();
+        String title = "Você foi escalado para servir: " + event.sector().name();
         String body = formattedDate(event.dateTime());
         Map<String, String> data = new HashMap<>();
         data.put("title", title);
@@ -65,7 +65,7 @@ public class EventController {
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventDto> updateEvent(
             @PathVariable("eventId") Long eventId, @RequestBody EventInput eventInput) {
-        Sector sector = sectorRepository.findById(eventInput.sectorId())
+        Sector sector = sectorService.findById(eventInput.sectorId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Set<User> workers = new HashSet<>(userRepository.findAllById(eventInput.workers()));
 

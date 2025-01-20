@@ -1,7 +1,7 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.infra.event;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.Event;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.sector.Sector;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.sector.SectorEntity;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +25,7 @@ public class EventEntity {
 
     @ManyToOne
     @JoinColumn(name = "sector_id")
-    private Sector sector;
+    private SectorEntity sector;
 
     @ManyToMany
     @JoinTable(
@@ -38,12 +38,12 @@ public class EventEntity {
     public EventEntity(Event event) {
         this.id = event.id();
         this.dateTime = event.dateTime();
-        this.sector = event.sector();
+        this.sector = new SectorEntity(event.sector());
         this.workers = event.workers();
     }
 
     public Event toModel() {
-        return new Event(id, dateTime, sector,workers);
+        return new Event(id, dateTime, sector.toModel(), workers);
     }
 
 }

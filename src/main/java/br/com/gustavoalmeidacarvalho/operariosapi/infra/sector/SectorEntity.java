@@ -1,19 +1,19 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.domain.model.sector;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.sector;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.model.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "tb_sector")
 @Data
 @NoArgsConstructor
-public class Sector {
+public class SectorEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,15 +34,15 @@ public class Sector {
     )
     private Set<User> workers = new HashSet<>();
 
-    public Sector(Integer sectorId) {
-        this.id = sectorId;
+    public SectorEntity(Sector sector) {
+        this.id = sector.id();
+        this.name = sector.name();
+        this.leader = sector.leader();
+        this.workers = sector.workers();
     }
 
-    public void addWorker(User worker) {
-        workers.add(worker);
+    public Sector toModel() {
+        return new Sector(id, name, leader, workers);
     }
 
-    public void removeWorker(User worker) {
-        workers.removeIf(user -> Objects.equals(user.getId(), worker.getId()));
-    }
 }
