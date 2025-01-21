@@ -1,7 +1,7 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.infra.auth;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.notification;
 
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.UserNotificationToken;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.UserNotificationTokenService;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.notification.UserNotificationToken;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.notification.UserNotificationTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

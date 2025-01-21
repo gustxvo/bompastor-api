@@ -1,4 +1,4 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.domain.auth;
+package br.com.gustavoalmeidacarvalho.operariosapi.domain.notification;
 
 public interface UserNotificationTokenService {
 

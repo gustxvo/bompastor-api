@@ -1,6 +1,6 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.infra.auth;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.notification;
 
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.UserNotificationToken;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.notification.UserNotificationToken;
 import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

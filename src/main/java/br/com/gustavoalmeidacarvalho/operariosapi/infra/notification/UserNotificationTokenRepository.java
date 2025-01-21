@@ -1,4 +1,4 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.infra.auth;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.notification;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

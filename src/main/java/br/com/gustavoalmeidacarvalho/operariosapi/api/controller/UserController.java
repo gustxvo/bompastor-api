@@ -4,8 +4,8 @@ import br.com.gustavoalmeidacarvalho.operariosapi.api.model.notification.DeviceI
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.notification.UserNotificationTokenRequest;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserProfileDto;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.UserNotificationToken;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.UserNotificationTokenService;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.notification.UserNotificationToken;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.notification.UserNotificationTokenService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
 import lombok.RequiredArgsConstructor;

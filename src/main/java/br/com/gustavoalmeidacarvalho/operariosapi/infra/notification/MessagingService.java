@@ -5,8 +5,6 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.Notification;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.notification.NotificationMessage;
-import br.com.gustavoalmeidacarvalho.operariosapi.infra.auth.UserNotificationTokenEntity;
-import br.com.gustavoalmeidacarvalho.operariosapi.infra.auth.UserNotificationTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

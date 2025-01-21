@@ -1,6 +1,7 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.infra.auth;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.LogoutService;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.notification.UserNotificationTokenRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
