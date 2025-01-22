@@ -6,6 +6,7 @@ import br.com.gustavoalmeidacarvalho.operariosapi.api.model.auth.LogoutRequest;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.auth.RefreshTokenRequest;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.auth.RegisterRequest;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserDto;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.AuthService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.LogoutService;
 import br.com.gustavoalmeidacarvalho.operariosapi.infra.auth.RefreshTokenServiceImpl;
 import br.com.gustavoalmeidacarvalho.operariosapi.infra.auth.RefreshTokenEntity;
@@ -34,6 +35,7 @@ import static br.com.gustavoalmeidacarvalho.operariosapi.config.SecurityConfig.J
 public class AuthController {
 
     private final JwtEncoder jwtEncoder;
+    private final AuthService authService;
     private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenServiceImpl refreshTokenService;
@@ -41,16 +43,9 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody RegisterRequest registerRequest) {
-        User user = User.create(
-                registerRequest.name(),
-                registerRequest.email(),
-                passwordEncoder.encode(registerRequest.password()),
-                registerRequest.role()
-        );
+        User savedUser = authService.register(registerRequest.toDomain());
 
-        UserDto savedUser = UserDto.fromDomain(userService.save(user));
-
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        return new ResponseEntity<>(UserDto.fromDomain(savedUser), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
