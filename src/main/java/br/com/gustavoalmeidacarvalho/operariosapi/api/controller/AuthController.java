@@ -7,25 +7,18 @@ import br.com.gustavoalmeidacarvalho.operariosapi.api.model.auth.RefreshTokenReq
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.auth.RegisterRequest;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.AuthService;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.LogoutService;
-import br.com.gustavoalmeidacarvalho.operariosapi.infra.auth.RefreshTokenServiceImpl;
-import br.com.gustavoalmeidacarvalho.operariosapi.infra.auth.RefreshTokenEntity;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.JwtTokenPair;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.JwtTokenService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
+import java.util.UUID;
 
 import static br.com.gustavoalmeidacarvalho.operariosapi.config.SecurityConfig.JWT_EXPIRATION_IN_SECONDS;
 
@@ -34,12 +27,8 @@ import static br.com.gustavoalmeidacarvalho.operariosapi.config.SecurityConfig.J
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final JwtEncoder jwtEncoder;
     private final AuthService authService;
-    private final UserService userService;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final RefreshTokenServiceImpl refreshTokenService;
-    private final LogoutService logoutService;
+    private final JwtTokenService jwtTokenService;
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody RegisterRequest registerRequest) {
@@ -50,57 +39,32 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtTokenResponseDto> login(@RequestBody LoginRequest loginRequest) {
-        User user = userService.findByEmail(loginRequest.email())
-                .filter(userCredentials -> isLoginCorrect(loginRequest, userCredentials))
-                .orElseThrow(() -> new BadCredentialsException("User or password is invalid"));
-
-        String accessToken = generateJwtToken(user);
-        RefreshTokenEntity refreshToken = refreshTokenService.generateRefreshToken(user.id());
+        User user = authService.loginWithEmailAndPassword(loginRequest.email(), loginRequest.password());
+        JwtTokenPair jwtTokenPair = jwtTokenService.generateJwtTokenPair(user);
 
         return ResponseEntity.ok(new JwtTokenResponseDto(
-                accessToken,
-                refreshToken.getToken(),
+                jwtTokenPair.accessToken(),
+                jwtTokenPair.refreshToken().toString(),
                 JWT_EXPIRATION_IN_SECONDS
         ));
     }
 
     @PostMapping("/refresh-token")
     public ResponseEntity<JwtTokenResponseDto> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
-        RefreshTokenEntity refreshToken = refreshTokenService.findByToken(refreshTokenRequest.token())
-                .map(refreshTokenService::invalidateToken)
-                .orElseThrow();
-
-        String accessToken = generateJwtToken(refreshToken.getUser().toModel());
+        UUID refreshToken = UUID.fromString(refreshTokenRequest.token());
+        JwtTokenPair jwtTokenPair = jwtTokenService.invalidateRefreshToken(refreshToken);
 
         return ResponseEntity.ok(new JwtTokenResponseDto(
-                accessToken,
-                refreshToken.getToken(),
+                jwtTokenPair.accessToken(),
+                jwtTokenPair.refreshToken().toString(),
                 JWT_EXPIRATION_IN_SECONDS
         ));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody LogoutRequest logoutRequest) {
-        logoutService.logout(logoutRequest.deviceId(), logoutRequest.refreshToken().toString());
+        authService.logout(logoutRequest.deviceId(), logoutRequest.refreshToken());
         return ResponseEntity.noContent().build();
-    }
-
-    private boolean isLoginCorrect(LoginRequest loginRequest, User user) {
-        return passwordEncoder.matches(loginRequest.password(), user.password());
-    }
-
-    private String generateJwtToken(User user) {
-        Instant now = Instant.now();
-
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("bompastor-api")
-                .subject(user.id().toString())
-                .issuedAt(now)
-                .expiresAt(now.plusSeconds(JWT_EXPIRATION_IN_SECONDS))
-                .claim("scope", user.role())
-                .build();
-
-        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
 }

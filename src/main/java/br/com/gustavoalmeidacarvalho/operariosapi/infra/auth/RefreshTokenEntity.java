@@ -1,5 +1,6 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.infra.auth;
 
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.RefreshToken;
 import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -31,8 +33,7 @@ public class RefreshTokenEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    public boolean isExpired() {
-        return expirationDate.isBefore(Instant.now());
+    public RefreshToken toModel() {
+        return new RefreshToken(id, UUID.fromString(token), expirationDate, user.toModel());
     }
-
 }
