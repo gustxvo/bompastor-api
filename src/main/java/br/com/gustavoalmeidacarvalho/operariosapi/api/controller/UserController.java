@@ -7,17 +7,16 @@ import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserProfileDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.notification.UserNotificationToken;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.notification.UserNotificationTokenService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserProfile;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -28,8 +27,8 @@ public class UserController {
     private final UserService userService;
     private final UserNotificationTokenService notificationTokenService;
 
-    @GetMapping
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @GetMapping
     public List<UserDto> list() {
         return userService.findAll().stream()
                 .map(UserDto::fromDomain)
@@ -39,14 +38,13 @@ public class UserController {
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> findById(@PathVariable("userId") String userId) {
-        User user =
-                userService.findById(UUID.fromString(userId)).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userService.findById(UUID.fromString(userId));
         return ResponseEntity.ok(UserDto.fromDomain(user));
     }
 
     @GetMapping("/profile")
     public ResponseEntity<UserProfileDto> getProfile(JwtAuthenticationToken token) {
-        User user = userService.findById(UUID.fromString(token.getName())).orElseThrow();
+        User user = userService.findById(UUID.fromString(token.getName()));
         return ResponseEntity.ok(UserProfileDto.fromEntity(user));
     }
 
@@ -55,28 +53,16 @@ public class UserController {
             @RequestBody UserProfileDto profile,
             JwtAuthenticationToken token
     ) {
-        User user = userService.findById(UUID.fromString(token.getName()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY));
-        if (!emailIsAvailable(profile.email(), user.email())) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        User updatedUserProfile = new User(user.id(), profile.name(), profile.email(), user.password(), user.role());
-        return ResponseEntity.ok(UserProfileDto.fromEntity(updatedUserProfile));
+        UUID userId = UUID.fromString(token.getName());
+        User user = userService.updateProfile(new UserProfile(userId, profile.name(), profile.email()));
+        return ResponseEntity.ok(UserProfileDto.fromEntity(user));
     }
 
     @DeleteMapping("/delete-account")
-    public ResponseEntity<UserProfileDto> deleteProfile(JwtAuthenticationToken token) {
+    public ResponseEntity<Void> deleteProfile(JwtAuthenticationToken token) {
         UUID userId = UUID.fromString(token.getName());
-        if (!userService.existsById(userId)) {
-            return ResponseEntity.notFound().build();
-        }
         userService.deleteById(userId);
         return ResponseEntity.noContent().build();
-    }
-
-    private boolean emailIsAvailable(String currentEmail, String newEmail) {
-        return userService.existsByEmail(newEmail) && !Objects.equals(currentEmail, newEmail);
     }
 
     @PostMapping("/allow-notifications")
@@ -90,7 +76,7 @@ public class UserController {
 
         UUID userId = UUID.fromString(jwtToken.getName());
 
-        User user = userService.findById(userId).orElseThrow();
+        User user = userService.findById(userId);
         UserNotificationToken userToken = UserNotificationToken.create(firebaseToken.token(), user.id());
 
         var token = notificationTokenService.save(userToken);

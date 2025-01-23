@@ -2,8 +2,8 @@ package br.com.gustavoalmeidacarvalho.operariosapi.api.controller;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.sector.SectorDto;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventService;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.LeaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -19,25 +19,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LeaderController {
 
-    private final SectorService sectorService;
-    private final EventService eventService;
+    private final LeaderService leaderService;
 
     @GetMapping("/sector")
-    public ResponseEntity<SectorDto> sector(JwtAuthenticationToken token) {
+    public ResponseEntity<SectorDto> getLeaderSector(JwtAuthenticationToken token) {
         UUID leaderId = UUID.fromString(token.getName());
-        SectorDto sector = sectorService.findByLeaderId(leaderId).stream()
-                .findFirst()
-                .map(SectorDto::fromDomain)
-                .orElseThrow(() -> new IllegalStateException("Sector with no leader"));
+        Sector sector = leaderService.findSectorByLeaderId(leaderId);
 
-        return ResponseEntity.ok(sector);
+        return ResponseEntity.ok(SectorDto.fromDomain(sector));
     }
 
     @GetMapping("/events")
-    public List<EventDto> events(JwtAuthenticationToken token) {
+    public List<EventDto> getLeaderEvents(JwtAuthenticationToken token) {
         UUID leaderId = UUID.fromString(token.getName());
 
-        return eventService.findAllBySectorLeaderId(leaderId).stream()
+        return leaderService.findEventsByLeaderId(leaderId).stream()
                 .map(EventDto::fromDomain)
                 .toList();
     }

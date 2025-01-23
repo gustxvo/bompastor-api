@@ -4,7 +4,7 @@ import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.AuthService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.auth.JwtTokenService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.exception.InvalidUserCredentials;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.UserService;
 import br.com.gustavoalmeidacarvalho.operariosapi.infra.notification.UserNotificationTokenRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,8 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.domain.user;
+package br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service;
+
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserProfile;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,13 +13,11 @@ public interface UserService {
 
     List<User> findAll();
 
-    Optional<User> findById(UUID uuid);
+    User findById(UUID uuid);
 
     User save(User user);
 
-    boolean existsById(UUID userId);
-
-    boolean existsByEmail(String email);
+    User updateProfile(UserProfile userProfile);
 
     Optional<User> findByEmail(String email);
 
@@ -26,5 +28,4 @@ public interface UserService {
     Set<User> getAvailableWorkers(Set<UUID> workerIds);
 
     void deleteById(UUID userId);
-
 }

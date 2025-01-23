@@ -6,7 +6,7 @@ import br.com.gustavoalmeidacarvalho.operariosapi.api.model.sector.WorkerIdInput
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserSummary;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.UserService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
 import lombok.RequiredArgsConstructor;
@@ -54,9 +54,7 @@ public class SectorController {
         Sector sector = sectorService.findById(sectorId)
                 .orElseThrow(() -> new IllegalStateException("Sector not found"));
 
-        User leader = userService.findById(leaderId.uuid())
-                .filter(user -> user.role() == UserRole.LEADER)
-                .orElseThrow(() -> new IllegalStateException("Leader not found"));
+        User leader = userService.findById(leaderId.uuid());
 
         sectorService.changeLeader(sector, leader);
 
@@ -67,7 +65,7 @@ public class SectorController {
     public ResponseEntity<Void> addWorker(
             @PathVariable("sectorId") Integer sectorId, @RequestBody WorkerIdInput workerId) {
         Sector sector = sectorService.findById(sectorId).orElseThrow();
-        User worker = userService.findById(workerId.uuid()).orElseThrow();
+        User worker = userService.findById(workerId.uuid());
 
         sectorService.addWorker(sector, worker);
 
@@ -78,7 +76,7 @@ public class SectorController {
     public ResponseEntity<Void> removeWorker(
             @PathVariable("sectorId") Integer sectorId, @RequestBody WorkerIdInput workerId) {
         Sector sector = sectorService.findById(sectorId).orElseThrow();
-        User worker = userService.findById(workerId.uuid()).orElseThrow();
+        User worker = userService.findById(workerId.uuid());
 
         sectorService.removeWorker(sector, worker);
 

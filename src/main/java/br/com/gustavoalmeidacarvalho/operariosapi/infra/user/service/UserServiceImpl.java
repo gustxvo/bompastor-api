@@ -1,19 +1,24 @@
-package br.com.gustavoalmeidacarvalho.operariosapi.infra.user;
+package br.com.gustavoalmeidacarvalho.operariosapi.infra.user.service;
 
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.exception.ResourceNotFoundException;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.exception.UserConflictException;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserProfile;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserService;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.UserService;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User.USER;
 
 @Service
 @RequiredArgsConstructor
@@ -23,17 +28,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findAll() {
-        return List.of();
+        return userRepository.findAll().stream()
+                .map(UserEntity::toModel)
+                .toList();
     }
 
     @Override
-    public Optional<User> findById(UUID uuid) {
-        return userRepository.findById(uuid).map(UserEntity::toModel);
+    public User findById(UUID userId) {
+        return userRepository.findById(userId)
+                .map(UserEntity::toModel)
+                .orElseThrow(() -> new ResourceNotFoundException(USER, userId));
     }
 
     @Override
     public User save(User user) {
-        if (userRepository.existsByEmail(user.email())) {
+        if (emailAlreadyTaken(user)) {
             throw new UserConflictException("Email already taken");
         }
         UserEntity newUser = userRepository.save(new UserEntity(user));
@@ -41,8 +50,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+    public User updateProfile(UserProfile userProfile) {
+        User user = findById(userProfile.userId());
+        User updatedUser = new User(user.id(), userProfile.name(), userProfile.email(), user.password(), user.role());
+        return save(updatedUser);
     }
 
     @Override
@@ -60,12 +71,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean existsById(UUID userId) {
-        return userRepository.existsById(userId);
-    }
-
-    @Override
     public void deleteById(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ResourceNotFoundException(USER, userId);
+        }
         userRepository.deleteById(userId);
     }
 
@@ -82,5 +91,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAllByIdNotIn(workerIds)
                 .stream().map(UserEntity::toModel)
                 .collect(Collectors.toSet());
+    }
+
+    private boolean emailAlreadyTaken(User user) {
+        return userRepository.findByEmail(user.email())
+                .filter((userEntity -> !Objects.equals(userEntity.getId(), user.id())))
+                .isPresent();
     }
 }
