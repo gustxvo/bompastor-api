@@ -44,26 +44,25 @@ public class AuthController {
 
         return ResponseEntity.ok(new JwtTokenResponseDto(
                 jwtTokenPair.accessToken(),
-                jwtTokenPair.refreshToken().toString(),
+                jwtTokenPair.refreshToken(),
                 JWT_EXPIRATION_IN_SECONDS
         ));
     }
 
     @PostMapping("/refresh-token")
     public ResponseEntity<JwtTokenResponseDto> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
-        UUID refreshToken = UUID.fromString(refreshTokenRequest.token());
-        JwtTokenPair jwtTokenPair = jwtTokenService.invalidateRefreshToken(refreshToken);
+        JwtTokenPair jwtTokenPair = jwtTokenService.invalidateRefreshToken(UUID.fromString(refreshTokenRequest.token()));
 
         return ResponseEntity.ok(new JwtTokenResponseDto(
                 jwtTokenPair.accessToken(),
-                jwtTokenPair.refreshToken().toString(),
+                jwtTokenPair.refreshToken(),
                 JWT_EXPIRATION_IN_SECONDS
         ));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody LogoutRequest logoutRequest) {
-        authService.logout(logoutRequest.deviceId(), logoutRequest.refreshToken());
+        authService.logout(logoutRequest.deviceId(), UUID.fromString(logoutRequest.refreshToken()));
         return ResponseEntity.noContent().build();
     }
 

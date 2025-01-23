@@ -1,6 +1,8 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.api.model.auth;
 
-public record JwtTokenResponseDto(String accessToken, String refreshToken, int expiresIn) {
+import java.util.UUID;
+
+public record JwtTokenResponseDto(String accessToken, UUID refreshToken, int expiresIn) {
 
     /**
      * 30 days in seconds
