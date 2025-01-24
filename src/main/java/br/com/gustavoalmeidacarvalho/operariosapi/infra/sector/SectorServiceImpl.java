@@ -1,16 +1,18 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.infra.sector;
 
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.exception.ResourceNotFoundException;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorRepository;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
+
+import static br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector.SECTOR;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +21,9 @@ public class SectorServiceImpl implements SectorService {
     private final SectorRepository sectorRepository;
 
     @Override
-    public Optional<Sector> findById(Integer sectorId) {
-        return sectorRepository.findById(sectorId);
+    public Sector findById(Integer sectorId) {
+        return sectorRepository.findById(sectorId)
+                .orElseThrow(() -> new ResourceNotFoundException(SECTOR, sectorId));
     }
 
     @Override

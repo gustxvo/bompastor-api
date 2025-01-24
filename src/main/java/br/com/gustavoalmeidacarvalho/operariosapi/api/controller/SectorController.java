@@ -42,29 +42,15 @@ public class SectorController {
 
     @GetMapping("/{sectorId}")
     public ResponseEntity<SectorDto> getSector(@PathVariable("sectorId") Integer sectorId) {
-        Sector sector = sectorService.findById(sectorId)
-                .orElseThrow(() -> new IllegalStateException("Sector not found"));
+        Sector sector = sectorService.findById(sectorId);
 
         return ResponseEntity.ok(SectorDto.fromDomain(sector));
-    }
-
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    @PatchMapping("/{sectorId}/change-leader")
-    public ResponseEntity<Void> changeLeader(@PathVariable("sectorId") Integer sectorId, @RequestBody LeaderIdInput leaderId) {
-        Sector sector = sectorService.findById(sectorId)
-                .orElseThrow(() -> new IllegalStateException("Sector not found"));
-
-        User leader = userService.findById(leaderId.uuid());
-
-        sectorService.changeLeader(sector, leader);
-
-        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{sectorId}/add-worker")
     public ResponseEntity<Void> addWorker(
             @PathVariable("sectorId") Integer sectorId, @RequestBody WorkerIdInput workerId) {
-        Sector sector = sectorService.findById(sectorId).orElseThrow();
+        Sector sector = sectorService.findById(sectorId);
         User worker = userService.findById(workerId.uuid());
 
         sectorService.addWorker(sector, worker);
@@ -75,7 +61,7 @@ public class SectorController {
     @PatchMapping("/{sectorId}/remove-worker")
     public ResponseEntity<Void> removeWorker(
             @PathVariable("sectorId") Integer sectorId, @RequestBody WorkerIdInput workerId) {
-        Sector sector = sectorService.findById(sectorId).orElseThrow();
+        Sector sector = sectorService.findById(sectorId);
         User worker = userService.findById(workerId.uuid());
 
         sectorService.removeWorker(sector, worker);
@@ -86,7 +72,6 @@ public class SectorController {
     @GetMapping("/{sectorId}/available-workers")
     public ResponseEntity<Set<UserSummary>> listAvailableWorkers(@PathVariable("sectorId") Integer sectorId) {
         Set<UUID> workerIds = sectorService.findById(sectorId)
-                .orElseThrow(() -> new IllegalStateException("Sector not found"))
                 .workers().stream()
                 .map(User::id)
                 .collect(Collectors.toSet());

@@ -51,6 +51,7 @@ public class SecurityConfig {
         return http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/admin/**").hasAnyAuthority("SCOPE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/leader/**").hasAnyAuthority("SCOPE_LEADER")
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated())

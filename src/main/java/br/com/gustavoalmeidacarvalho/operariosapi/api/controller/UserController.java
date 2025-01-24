@@ -2,7 +2,6 @@ package br.com.gustavoalmeidacarvalho.operariosapi.api.controller;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.notification.DeviceId;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.notification.UserNotificationTokenRequest;
-import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserProfileDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.notification.UserNotificationToken;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.notification.UserNotificationTokenService;
@@ -12,11 +11,9 @@ import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.UserServic
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,21 +23,6 @@ public class UserController {
 
     private final UserService userService;
     private final UserNotificationTokenService notificationTokenService;
-
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    @GetMapping
-    public List<UserDto> list() {
-        return userService.findAll().stream()
-                .map(UserDto::fromDomain)
-                .toList();
-    }
-
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> findById(@PathVariable("userId") String userId) {
-        User user = userService.findById(UUID.fromString(userId));
-        return ResponseEntity.ok(UserDto.fromDomain(user));
-    }
 
     @GetMapping("/profile")
     public ResponseEntity<UserProfileDto> getProfile(JwtAuthenticationToken token) {

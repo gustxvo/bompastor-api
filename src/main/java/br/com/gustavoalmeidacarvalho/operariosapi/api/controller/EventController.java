@@ -2,23 +2,26 @@ package br.com.gustavoalmeidacarvalho.operariosapi.api.controller;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventInput;
-import br.com.gustavoalmeidacarvalho.operariosapi.infra.notification.MessagingService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.Event;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.UserService;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
+import br.com.gustavoalmeidacarvalho.operariosapi.infra.notification.MessagingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,8 +36,7 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(@RequestBody EventInput eventInput) {
-        Sector sector = sectorService.findById(eventInput.sectorId())
-                .orElseThrow(() -> new IllegalStateException("Sector not found"));
+        Sector sector = sectorService.findById(eventInput.sectorId());
         Set<User> workers = new HashSet<>(userService.findAllById(eventInput.workers()));
         Set<UUID> workerIds = workers.stream().map(User::id).collect(Collectors.toSet());
 
@@ -65,8 +67,7 @@ public class EventController {
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventDto> updateEvent(
             @PathVariable("eventId") Long eventId, @RequestBody EventInput eventInput) {
-        Sector sector = sectorService.findById(eventInput.sectorId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Sector sector = sectorService.findById(eventInput.sectorId());
         Set<User> workers = new HashSet<>(userService.findAllById(eventInput.workers()));
 
         Event event = new Event(eventId, eventInput.dateTime(), sector, workers);

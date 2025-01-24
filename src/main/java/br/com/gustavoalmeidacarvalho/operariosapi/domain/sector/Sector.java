@@ -5,4 +5,7 @@ import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import java.util.Set;
 
 public record Sector(Integer id, String name, User leader, Set<User> workers) {
+
+    public static final String SECTOR = "sector";
+
 }

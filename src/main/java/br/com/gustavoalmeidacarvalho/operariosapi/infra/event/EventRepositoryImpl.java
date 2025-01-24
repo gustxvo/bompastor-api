@@ -16,14 +16,6 @@ public class EventRepositoryImpl implements EventRepository {
     private final EventJpaRepository jpaRepository;
 
     @Override
-    public List<Event> findAll() {
-        return jpaRepository.findAll()
-                .stream()
-                .map(EventEntity::toModel)
-                .toList();
-    }
-
-    @Override
     public Event create(Event event) {
         EventEntity eventEntity = new EventEntity(event);
         return jpaRepository.save(eventEntity).toModel();
