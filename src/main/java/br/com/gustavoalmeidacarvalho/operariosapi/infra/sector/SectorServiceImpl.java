@@ -5,12 +5,12 @@ import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorRepository;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import static br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector.SECTOR;
 
@@ -19,16 +19,12 @@ import static br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector.SE
 public class SectorServiceImpl implements SectorService {
 
     private final SectorRepository sectorRepository;
+    private final UserService userService;
 
     @Override
     public Sector findById(Integer sectorId) {
         return sectorRepository.findById(sectorId)
                 .orElseThrow(() -> new ResourceNotFoundException(SECTOR, sectorId));
-    }
-
-    @Override
-    public List<Sector> findByLeaderId(UUID leaderId) {
-        return sectorRepository.findByLeaderId(leaderId);
     }
 
     @Override

@@ -9,4 +9,8 @@ public record User (UUID id, String name, String email, String password, UserRol
     public static User create(String name, String email, String password, UserRole role) {
         return new User(null, name, email, password, role);
     }
+
+    public boolean isAdmin() {
+        return this.role == UserRole.ADMIN;
+    }
 }

@@ -3,13 +3,10 @@ package br.com.gustavoalmeidacarvalho.operariosapi.domain.sector;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface SectorService {
 
     Sector findById(Integer sectorId);
-
-    List<Sector> findByLeaderId(UUID leaderId);
 
     List<Sector> findAll();
 

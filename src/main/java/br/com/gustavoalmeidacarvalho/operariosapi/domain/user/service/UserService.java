@@ -2,7 +2,6 @@ package br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserProfile;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,11 +20,9 @@ public interface UserService {
 
     Optional<User> findByEmail(String email);
 
-    List<User> findByRole(UserRole userRole);
-
     Set<User> findAllById(Set<UUID> workers);
 
-    Set<User> getAvailableWorkers(Set<UUID> workerIds);
+    Set<User> getAvailableWorkers(Set<User> workersInSector);
 
     void deleteById(UUID userId);
 }

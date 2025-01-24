@@ -1,17 +1,14 @@
 package br.com.gustavoalmeidacarvalho.operariosapi.api.controller;
 
-import br.com.gustavoalmeidacarvalho.operariosapi.api.model.sector.LeaderIdInput;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.sector.SectorDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.sector.WorkerIdInput;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.user.UserSummary;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.UserService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.SectorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -70,19 +66,12 @@ public class SectorController {
     }
 
     @GetMapping("/{sectorId}/available-workers")
-    public ResponseEntity<Set<UserSummary>> listAvailableWorkers(@PathVariable("sectorId") Integer sectorId) {
-        Set<UUID> workerIds = sectorService.findById(sectorId)
-                .workers().stream()
-                .map(User::id)
+    public Set<UserSummary> listAvailableWorkers(@PathVariable("sectorId") Integer sectorId) {
+        Set<User> workersInSector = sectorService.findById(sectorId).workers();
+
+        return userService.getAvailableWorkers(workersInSector)
+                .stream()
+                .map(UserSummary::fromModel)
                 .collect(Collectors.toSet());
-
-        List<UUID> adminIds = userService.findByRole(UserRole.ADMIN).stream().map(User::id).toList();
-        workerIds.addAll(adminIds);
-
-        Set<UserSummary> availableWorkers = userService.getAvailableWorkers(workerIds).stream()
-                .map(UserSummary::fromEntity)
-                .collect(Collectors.toSet());
-
-        return ResponseEntity.ok(availableWorkers);
     }
 }

@@ -63,14 +63,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findByRole(UserRole userRole) {
-        return userRepository.findByRole(userRole)
-                .stream()
-                .map(UserEntity::toModel)
-                .toList();
-    }
-
-    @Override
     public void deleteById(UUID userId) {
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException(USER, userId);
@@ -87,9 +79,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<User> getAvailableWorkers(Set<UUID> workerIds) {
-        return userRepository.findAllByIdNotIn(workerIds)
-                .stream().map(UserEntity::toModel)
+    public Set<User> getAvailableWorkers(Set<User> workersInSector) {
+        Set<UUID> excludedWorkers = workersInSector.stream()
+                .filter(user -> !user.isAdmin())
+                .map(User::id)
+                .collect(Collectors.toSet());
+
+        return userRepository.findAllByIdNotIn(excludedWorkers)
+                .stream()
+                .map(UserEntity::toModel)
                 .collect(Collectors.toSet());
     }
 
