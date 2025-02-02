@@ -2,6 +2,7 @@ package br.com.gustavoalmeidacarvalho.operariosapi.api.controller;
 
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventDto;
 import br.com.gustavoalmeidacarvalho.operariosapi.api.model.event.EventInput;
+import br.com.gustavoalmeidacarvalho.operariosapi.api.model.notification.NotificationMessage;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.Event;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventService;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.sector.Sector;
@@ -49,9 +50,9 @@ public class EventController {
         data.put("icon", "https://imgur.com/vkdveuG.jpeg");
         data.put("body", body);
 
-//        NotificationMessage notification = new NotificationMessage(title, body, data);
+        NotificationMessage notification = new NotificationMessage(title, body, data);
 
-//        messagingService.sendNotification(workerIds, notification);
+        messagingService.sendNotification(workerIds, notification);
 
         EventDto eventCreated = EventDto.fromDomain(eventService.create(event));
         return new ResponseEntity<>(eventCreated, HttpStatus.CREATED);

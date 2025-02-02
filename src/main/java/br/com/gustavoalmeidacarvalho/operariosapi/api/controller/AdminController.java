@@ -31,7 +31,7 @@ public class AdminController {
                 .toList();
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/users/{userId}")
     public ResponseEntity<UserDto> findUserById(@PathVariable("userId") String userId) {
         User user = adminService.findUserById(UUID.fromString(userId));
         return ResponseEntity.ok(UserDto.fromDomain(user));
