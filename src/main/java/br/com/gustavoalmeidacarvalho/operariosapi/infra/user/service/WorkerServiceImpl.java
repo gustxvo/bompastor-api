@@ -3,10 +3,8 @@ package br.com.gustavoalmeidacarvalho.operariosapi.infra.user.service;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.Event;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.event.EventRepository;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRepository;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.WorkerService;
-import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
-import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,18 +20,12 @@ public class WorkerServiceImpl implements WorkerService {
 
     @Override
     public List<User> getWorkers() {
-        return userRepository.findByRoleNot(UserRole.ADMIN)
-                .stream()
-                .map(UserEntity::toModel)
-                .toList();
+        return userRepository.findWorkers();
     }
 
     @Override
     public List<Event> getNextWorkerEvents(UUID workerId) {
-        return eventRepository
-                .findAllByWorkerId(workerId)
-                .stream()
-                .toList();
+        return eventRepository.findAllByWorkerId(workerId);
     }
 
 }

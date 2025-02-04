@@ -20,9 +20,10 @@ public interface UserService {
 
     Optional<User> findByEmail(String email);
 
-    Set<User> findAllById(Set<UUID> workers);
+    List<User> findAllById(Set<UUID> workers);
 
     Set<User> getAvailableWorkers(Set<User> workersInSector);
 
     void deleteById(UUID userId);
+
 }

@@ -4,10 +4,8 @@ import br.com.gustavoalmeidacarvalho.operariosapi.domain.exception.ResourceNotFo
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.exception.UserConflictException;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserProfile;
-import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRepository;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.UserService;
-import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserEntity;
-import br.com.gustavoalmeidacarvalho.operariosapi.infra.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,25 +26,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findAll() {
-        return userRepository.findAll().stream()
-                .map(UserEntity::toModel)
-                .toList();
+        return userRepository.findAll();
     }
 
     @Override
     public User findById(UUID userId) {
         return userRepository.findById(userId)
-                .map(UserEntity::toModel)
                 .orElseThrow(() -> new ResourceNotFoundException(USER, userId));
     }
 
     @Override
     public User save(User user) {
-        if (emailAlreadyTaken(user)) {
+        if (emailAlreadyTakenByAnotherUser(user)) {
             throw new UserConflictException("Email already taken");
         }
-        UserEntity newUser = userRepository.save(new UserEntity(user));
-        return newUser.toModel();
+        return userRepository.save(user);
     }
 
     @Override
@@ -58,8 +52,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .map(UserEntity::toModel);
+        return userRepository.findByEmail(email);
     }
 
     @Override
@@ -71,11 +64,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<User> findAllById(Set<UUID> workerIds) {
-        return userRepository.findAllById(workerIds)
-                .stream()
-                .map(UserEntity::toModel)
-                .collect(Collectors.toSet());
+    public List<User> findAllById(Set<UUID> workerIds) {
+        return userRepository.findAllById(workerIds);
     }
 
     @Override
@@ -85,15 +75,12 @@ public class UserServiceImpl implements UserService {
                 .map(User::id)
                 .collect(Collectors.toSet());
 
-        return userRepository.findAllByIdNotIn(excludedWorkers)
-                .stream()
-                .map(UserEntity::toModel)
-                .collect(Collectors.toSet());
+        return userRepository.findAllByIdExcept(excludedWorkers);
     }
 
-    private boolean emailAlreadyTaken(User user) {
+    private boolean emailAlreadyTakenByAnotherUser(User user) {
         return userRepository.findByEmail(user.email())
-                .filter((userEntity -> !Objects.equals(userEntity.getId(), user.id())))
+                .filter((foundUser -> !Objects.equals(foundUser.id(), user.id())))
                 .isPresent();
     }
 }
