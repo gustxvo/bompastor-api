@@ -5,6 +5,7 @@ import br.com.gustavoalmeidacarvalho.operariosapi.domain.exception.UserConflictE
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserProfile;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRepository;
+import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole;
 import br.com.gustavoalmeidacarvalho.operariosapi.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -70,12 +71,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<User> getAvailableWorkers(Set<User> workersInSector) {
-        Set<UUID> excludedWorkers = workersInSector.stream()
-                .filter(user -> !user.isAdmin())
-                .map(User::id)
+        List<User> admins = userRepository.findByRole(UserRole.ADMIN);
+        Set<UUID> excludedUsers = Set.of(workersInSector, admins).stream()
+                .flatMap(users -> users.stream().map(User::id))
                 .collect(Collectors.toSet());
 
-        return userRepository.findAllByIdExcept(excludedWorkers);
+        return userRepository.findAllByIdExcept(excludedUsers);
     }
 
     private boolean emailAlreadyTakenByAnotherUser(User user) {

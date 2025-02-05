@@ -17,6 +17,8 @@ public interface UserRepository {
 
     List<User> findWorkers();
 
+    List<User> findByRole(UserRole userRole);
+
     List<User> findAllById(Iterable<UUID> userIds);
 
     Set<User> findAllByIdExcept(Iterable<UUID> userIds);
@@ -24,5 +26,4 @@ public interface UserRepository {
     void deleteById(UUID userId);
 
     boolean existsById(UUID userId);
-
 }

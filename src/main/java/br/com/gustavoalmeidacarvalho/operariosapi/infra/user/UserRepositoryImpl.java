@@ -51,6 +51,13 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<User> findByRole(UserRole userRole) {
+        return jpaRepository.findByRole(UserRole.ADMIN).stream()
+                .map(UserEntity::toModel)
+                .toList();
+    }
+
+    @Override
     public List<User> findAllById(Iterable<UUID> userIds) {
         return jpaRepository.findAllById(userIds).stream()
                 .map(UserEntity::toModel)
