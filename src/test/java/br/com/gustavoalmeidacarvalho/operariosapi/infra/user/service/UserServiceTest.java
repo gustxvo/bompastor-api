@@ -22,7 +22,7 @@ import static br.com.gustavoalmeidacarvalho.operariosapi.domain.user.User.USER;
 import static br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole.ADMIN;
 import static br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole.LEADER;
 import static br.com.gustavoalmeidacarvalho.operariosapi.domain.user.UserRole.WORKER;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -50,7 +50,7 @@ class UserServiceTest {
         List<User> users = userService.findAll();
 
         assertThat(users).isNotNull();
-        assertThat(users.size()).isEqualTo(3);
+        assertThat(users).hasSize(3);
     }
 
     @Test
